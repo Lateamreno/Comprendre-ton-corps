@@ -125,12 +125,13 @@ export function toutesLesDP(): DoublePage[] {
     analyser(fichier, fs.readFileSync(path.join(DOSSIER_DP, fichier), 'utf8')),
   )
 
+  // Unicité dans tout le livre, pas seulement dans la partie : un slug est
+  // une question, et l'atelier adresse une DP par ce seul slug.
   const vus = new Map<string, string>()
   for (const page of pages) {
-    const cle = `${page.partie}/${page.slug}`
-    const precedent = vus.get(cle)
-    if (precedent) erreur(page.fichier, `le slug « ${cle} » est déjà utilisé par ${precedent}.`)
-    vus.set(cle, page.fichier)
+    const precedent = vus.get(page.slug)
+    if (precedent) erreur(page.fichier, `le slug « ${page.slug} » est déjà utilisé par ${precedent}.`)
+    vus.set(page.slug, page.fichier)
   }
 
   pages.sort((a, b) => a.partie - b.partie || a.ordre - b.ordre)
@@ -155,6 +156,22 @@ function situer(dp: DoublePage): DoublePageSituee {
 
 export function dpParSlug(slugPartie: string, slug: string): DoublePageSituee | undefined {
   return dpPubliables().find((dp) => dp.partieRef.slug === slugPartie && dp.slug === slug)
+}
+
+/**
+ * Toutes les DP, brouillons compris. Réservé à l'atelier : c'est là que se
+ * suit la production, donc rien n'y est filtré.
+ */
+export function toutesLesDPSituees(): DoublePageSituee[] {
+  return toutesLesDP().map(situer)
+}
+
+export function dpAtelierParSlug(slug: string): DoublePageSituee | undefined {
+  return toutesLesDPSituees().find((dp) => dp.slug === slug)
+}
+
+export function cheminAtelier(dp: DoublePage): string {
+  return `/atelier/${dp.slug}`
 }
 
 /** Voisines dans l'ordre de lecture, pour la navigation précédent / suivant. */

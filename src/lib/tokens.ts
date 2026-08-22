@@ -275,6 +275,43 @@ export const filet = `1px solid ${palette.grisVide}`
 export const doublePage = { largeurMm: 400, hauteurMm: 270 } as const
 
 /* ------------------------------------------------------------------ */
+/* Échelle du livre imprimé                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Tailles de composition du livre, en millimètres.
+ *
+ * Distinctes des tailles d'écran : c'est ce qui permet de juger la densité
+ * réelle d'une double page. Un corps à 3,4 mm vaut environ 9,6 points.
+ */
+export const taillesImprimees = {
+  legende: 2.6,
+  numero: 3,
+  corps: 3.4,
+  intertitre: 5.2,
+  titre: 11,
+} as const
+
+/** Marges de composition d'une double page, en millimètres. */
+export const margesImprimees = {
+  exterieure: 18,
+  haute: 16,
+  basse: 18,
+  /** Blanc de part et d'autre de la pliure, pour chaque page. */
+  fond: 14,
+} as const
+
+/**
+ * Convertit une mesure en millimètres vers l'unité `cqw`, soit 1 % de la
+ * largeur du cadre. Le spread se met ainsi à l'échelle sans rien recalculer :
+ * à n'importe quelle taille d'affichage, les proportions restent celles de
+ * la double page imprimée.
+ */
+export function mmEnCqw(mm: number): string {
+  return `${(mm / doublePage.largeurMm) * 100}cqw`
+}
+
+/* ------------------------------------------------------------------ */
 /* Export vers CSS                                                    */
 /* ------------------------------------------------------------------ */
 
