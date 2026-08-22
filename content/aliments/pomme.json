@@ -1,0 +1,16 @@
+{
+  "slug": "pomme",
+  "nom": "Pomme",
+  "precision": "chair et peau, crue",
+  "image": "/img/aliments/pomme.jpg",
+  "ciqual": "13039",
+  "portion": {
+    "grammes": 140,
+    "volumeMl": 140,
+    "libelle": "une pomme moyenne"
+  },
+  "indiceGlycemique": {
+    "valeur": 36,
+    "source": "Atkinson FS, Brand-Miller JC et al., International Tables of Glycemic Index and Glycemic Load Values 2021, American Journal of Clinical Nutrition"
+  }
+}
