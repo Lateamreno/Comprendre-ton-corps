@@ -128,78 +128,104 @@ Le registre visé est celui d'un instrument de mesure moderne — précis, lisib
 
 ### Palette
 
+Relevée dans les maquettes validées, au pixel — ce ne sont pas des valeurs approchées.
+
 ```
---fond            #FAFAF7   crème, dominante
---fond-carte      #F4F3EF   fonds de fiches
---texte           #1A1A1A   noir adouci — TOUS les textes courants et tous les chiffres
---texte-faible    #6E6A66   unités, légendes, mentions
+--fond            #F7F8FA   gris très clair, hors carte
+--fond-carte      #FFFFFF   fond des fiches
+--texte           #152035   navy sombre — textes courants et chiffres
+--texte-faible    #8C9199   unités, légendes, mentions
 
---vert            #1E8A63   favorable, marque, éléments d'interface
---vert-clair      #58B894   remplissages partiels, survols
+--piste           #EFF0F0   part non remplie d'une barre, d'un anneau, d'un picto
 
---orange          #E8823C   intermédiaire, énergie, tracés de courbes
---orange-fonce    #D2691E   texte sur fond clair quand l'orange doit rester lisible
+--vert            #159949   valeur favorable, verdict, marque
+--vert-clair      #7FBE6D   remplissage de barre
+--vert-tendre     #A2CF8C   remplissage d'anneau et de pictogramme
 
---rouge           #D64545   dépassement, valeur à surveiller
---gris-vide       #E2E0DA   part non remplie d'une jauge ou d'un picto
+--jaune           #FBC83B   remplissage d'énergie et de lipides
+--orange          #F69B00   valeur secondaire (énergie nette)
+--rouge           #D24A3E   valeur élevée, à surveiller
+
+--bleu            #2E6FE0   satiété
+--violet          #586BDC   glycémie, texte de verdict
+--violet-clair    #8D85EF   glycémie, tracé de courbe
+
+--verdict-debut   #91CC8B   bandeau de verdict, dégradé horizontal
+--verdict-fin     #3DC1C0
 ```
 
-L'orange est un **orange franc et moderne**, celui des courbes de la maquette de référence. Ce n'est pas une terre cuite, pas une brique, pas un ocre. En cas de doute, aller vers le lumineux plutôt que vers le terreux.
+### Le système de couleurs
 
-Le vert est **profond mais vivant**. Ni sapin éteint, ni vert pomme « détox ».
+Deux registres distincts, qui ne se mélangent pas.
 
-### Le système sémantique
+**La couleur d'identité** dit *de quelle grandeur on parle*. Elle ne varie jamais d'une
+fiche à l'autre : l'énergie est jaune, la satiété bleue, la glycémie violette. C'est ce
+qui permet de retrouver une grandeur d'un coup d'œil, sans lire l'étiquette.
 
-C'est le cœur de la charte. **Une couleur = une position sur une échelle, toujours la même, partout dans le livre.**
-
-| Couleur | Signifie | Exemples d'usage |
+| Grandeur | Identité | Pictogramme |
 |---|---|---|
-| Vert | favorable, bas, dans la norme | verdict « OK », IG bas, ratio de fibres élevé, part remplie d'une jauge normale |
-| Orange | intermédiaire, à considérer | verdict « Modéré », IG moyen, courbe glycémique standard, valeur d'énergie |
-| Rouge | élevé, hors norme, à surveiller | verdict « Piège », ratio de sucres élevé, dépassement de seuil |
-| Gris | absence, vide, non applicable | part non remplie, valeur nulle, donnée manquante |
+| Énergie | jaune | flamme |
+| Protéines | vert | haltère |
+| Lipides | jaune | bouteille |
+| Glucides, dont sucres | vert | cubes de sucre |
+| Fibres | vert | feuille |
+| Part d'une journée | vert | anneau |
+| Volume | vert | estomac |
+| Satiété | bleu | chronomètre |
+| Glycémie | violet | courbe |
 
-Cette échelle est **la seule** justification d'un changement de couleur. Une couleur ne doit jamais varier pour « aérer », « rythmer » ou « faire joli ».
+**La couleur de valeur** dit *où se situe la mesure* : vert favorable, orange
+intermédiaire, rouge à surveiller, gris absent. Elle porte les verdicts et les
+valeurs qui en portent un — le « 3 g » de sucres, le mot « DOUX ».
 
-Corollaire : **aucune couleur n'est décidée à la main dans un composant.** Les seuils vivent dans `lib/tokens.ts` sous forme de fonctions (`couleurIG(valeur)`, `couleurRatioSucres(sucres, glucides)`, etc.), et les composants appellent ces fonctions. C'est ce qui garantit que la pomme et le croissant sont jugés par la même règle, sur 100 doubles pages.
-
-Couleurs **exclues** : bleu, violet, jaune, rose, et tout dégradé multicolore. La maquette de référence utilisait du bleu pour la satiété et du violet pour la glycémie — ces deux emplois sont remplacés par l'échelle ci-dessus, sans quoi le système se dilue et redevient un tableur.
+Corollaire inchangé : **aucune couleur n'est décidée à la main dans un composant.**
+Identités et seuils vivent dans `lib/tokens.ts`, et les composants les interrogent.
+C'est ce qui garantit que la pomme et le croissant sont jugés par la même règle.
 
 ### Encodage de l'information
 
-La couleur situe, mais elle ne porte jamais l'information seule (daltonisme, impression noir et blanc, photocopie). Chaque donnée est doublée d'un **remplissage proportionnel** :
+La couleur situe, mais elle ne porte jamais l'information seule (daltonisme,
+impression en noir et blanc). Chaque donnée est doublée d'un **remplissage
+proportionnel** :
 
-- les pictogrammes se remplissent selon la valeur — la bouteille se remplit de lipides, les cubes de sucre se colorent selon le ratio sucres/glucides, la flamme porte le total ;
-- les jauges suivent la même grammaire : anneau de pourcentage, volume stomacal, chronomètre de satiété, courbe glycémique ;
-- le vide est en `--gris-vide`, le rempli prend la couleur de l'échelle.
+- une barre sous chaque pictogramme, piste en `--piste`, part remplie dans la
+  couleur de la grandeur ;
+- l'anneau de pourcentage, le volume stomacal, le niveau de la bouteille et l'aire
+  sous la courbe glycémique suivent la même grammaire.
 
-Principe non négociable : **l'information vit dans le dessin.** Un chiffre posé à côté d'une icône décorative est un échec de conception.
+Principe non négociable : **l'information vit dans le dessin.**
+
+### Pictogrammes
+
+Bibliothèque propriétaire, en rendu dimensionnel — flamme, haltère, bouteille,
+cubes de sucre, feuille, anneau, estomac, chronomètre, courbe. Ils sont posés en
+haut de chaque colonne et portent la couleur d'identité de leur grandeur.
+
+Un pictogramme est un **actif fixe** : c'est la barre, l'anneau ou le niveau
+au-dessous qui porte la valeur. Les deux seuls pictogrammes dont le remplissage
+est lui-même une donnée sont l'anneau et l'estomac.
 
 ### Typographie
 
-- **Fraunces** — titres, en italique sur les très grandes tailles
-- **Inter** — corps de texte
-- **JetBrains Mono** — chiffres, unités, légendes, étiquettes techniques
+- **Montserrat** — titres de fiche, chiffres, unités, verdicts
+- **Inter** — étiquettes et textes courts d'interface
+- **Fraunces** — titres du livre et pages de lecture
 
 Toutes auto-hébergées (règle 2), avec `font-display: swap` et fallbacks système.
-
-Les valeurs numériques sont **en noir**, pas en couleur, sauf quand la valeur elle-même porte un verdict (le « 3 g » de sucres élevé, le mot « MODÉRÉ »). Les chiffres tabulaires sont obligatoires : c'est ce qui fait tenir les colonnes d'une fiche à l'autre.
+Les chiffres tabulaires sont obligatoires : c'est ce qui fait tenir les colonnes
+d'une fiche à l'autre.
 
 ### Formes
 
-Beaucoup de blanc. Hiérarchie franche. Filets fins plutôt que cadres pleins. Angles nets ou très légèrement adoucis (2 px maximum).
-
-Ce que la maquette de référence contenait et qui ne doit **pas** être repris : fond gris uni, ombres portées douces, boutons pleins à dégradé, éléments d'interface (le bouton « OK » n'a pas de sens sur une page de livre), et surtout les pictogrammes de style emoji système.
-
-Les pictogrammes seront redessinés dans un style propriétaire (bibliothèque d'environ 25 pièces, brief illustrateur en cours). Tant qu'ils n'existent pas : tracés géométriques neutres, jamais d'emoji.
-
-Inversion sur fond sombre : autorisée en ponctuation, sur les DP les plus denses en visualisation de données. Deux ou trois par partie au maximum.
+Cartes blanches à angles arrondis sur fond gris très clair, séparées par des filets
+fins. Ombres douces admises pour détacher une carte de son fond. Le bandeau de
+verdict est un aplat à dégradé horizontal.
 
 ### Travail avec Claude Design
 
-`lib/tokens.ts` est la source de vérité. Toute exploration visuelle en part et y revient : les valeurs ne sont jamais retapées dans un composant. Une proposition qui introduit une couleur hors palette, ou qui utilise une couleur de l'échelle pour autre chose que sa signification, doit être signalée comme un écart — pas intégrée silencieusement.
-
----
+`lib/tokens.ts` est la source de vérité. Toute exploration visuelle en part et y
+revient : les valeurs ne sont jamais retapées dans un composant. Une proposition
+qui s'écarte des maquettes validées doit être signalée, pas intégrée silencieusement.
 
 ## 9. SEO
 
@@ -233,14 +259,9 @@ Chacun se valide sur une preview Vercel avant de passer au suivant.
 - Réintroduire une base de données ou un CMS « pour simplifier »
 - Toute troncature côté client
 - `next/font/google`
-- Bleu, violet, jaune, rose, dégradés multicolores
-- Une terre cuite, une brique ou un ocre à la place de l'orange franc
-- Utiliser une couleur de l'échelle sémantique pour un usage décoratif
 - Écrire une couleur en dur dans un composant au lieu d'appeler `lib/tokens.ts`
 - Faire porter une information par la seule couleur, sans remplissage ni libellé
-- Des pictogrammes de style emoji système
-- Ombres portées, dégradés décoratifs, effets de relief ou de verre
-- Des éléments d'interface d'application sur une page de livre (boutons d'action, bascules, badges)
+- S'écarter des maquettes validées sans le signaler
 - Du texte qui promet un résultat, motive, ou s'adresse au lecteur en coach
 - Publier une DP au statut `brouillon`
 - Des données nutritionnelles sans source citée
