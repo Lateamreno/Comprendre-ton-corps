@@ -73,7 +73,7 @@ export function Spread({ dp }: { dp: DoublePageSituee }) {
         width: '100%',
         aspectRatio: `${doublePage.largeurMm} / ${doublePage.hauteurMm}`,
         background: palette.fond,
-        border: `1px solid ${palette.grisVide}`,
+        border: `1px solid ${palette.piste}`,
         color: palette.texte,
         fontFamily: polices.texte,
         overflow: 'hidden',
@@ -88,7 +88,7 @@ export function Spread({ dp }: { dp: DoublePageSituee }) {
           bottom: 0,
           left: '50%',
           width: '1px',
-          background: palette.grisVide,
+          background: palette.piste,
         }}
       />
 
@@ -152,7 +152,7 @@ export function Spread({ dp }: { dp: DoublePageSituee }) {
             style={{
               marginTop: mm(4),
               paddingTop: mm(2),
-              borderTop: `1px solid ${palette.grisVide}`,
+              borderTop: `1px solid ${palette.piste}`,
               fontFamily: polices.chiffre,
               fontSize: mm(taillesImprimees.legende),
               color: palette.texteFaible,

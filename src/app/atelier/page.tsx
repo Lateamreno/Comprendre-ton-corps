@@ -21,7 +21,7 @@ export default function AtelierIndex() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
-      <header className="border-b border-gris-vide pb-8">
+      <header className="border-b border-piste pb-8">
         <h1 className="text-titre font-titre font-semibold">Atelier</h1>
         <p className="mt-3 text-texte-faible">
           Suivi de production. Cette vue n&rsquo;est pas indexée et montre les
@@ -64,7 +64,7 @@ export default function AtelierIndex() {
                 {pagesDeLaPartie.map((dp) => (
                   <li
                     key={dp.fichier}
-                    className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-gris-vide py-4"
+                    className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-piste py-4"
                   >
                     <span className="flex items-baseline gap-4">
                       <span className="chiffre text-legende text-texte-faible">{dp.numero}</span>

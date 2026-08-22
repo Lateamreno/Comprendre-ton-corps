@@ -13,20 +13,48 @@
 /* ------------------------------------------------------------------ */
 
 export const palette = {
-  fond: '#FAFAF7',
-  fondCarte: '#F4F3EF',
-  texte: '#1A1A1A',
-  texteFaible: '#6E6A66',
+  fond: '#F7F8FA',
+  fondCarte: '#FFFFFF',
+  texte: '#152035',
+  texteFaible: '#8C9199',
 
-  vert: '#1E8A63',
-  vertClair: '#58B894',
+  /** Part non remplie d'une barre, d'un anneau, d'un pictogramme. */
+  piste: '#EFF0F0',
 
-  orange: '#E8823C',
-  orangeFonce: '#D2691E',
+  vert: '#159949',
+  vertClair: '#7FBE6D',
+  vertTendre: '#A2CF8C',
 
-  rouge: '#D64545',
-  grisVide: '#E2E0DA',
+  jaune: '#FBC83B',
+  orange: '#F69B00',
+  rouge: '#D24A3E',
+
+  bleu: '#2E6FE0',
+  violet: '#586BDC',
+  violetClair: '#8D85EF',
+
+  verdictDebut: '#91CC8B',
+  verdictFin: '#3DC1C0',
 } as const
+
+/**
+ * La couleur d'identité d'une grandeur. Elle ne varie jamais d'une fiche à
+ * l'autre : c'est ce qui permet de retrouver une grandeur sans lire
+ * l'étiquette (CLAUDE.md §8).
+ */
+export const identites = {
+  energie: { couleur: '#FBC83B', picto: '/img/pictos/flamme.png', libelle: 'Énergie' },
+  proteines: { couleur: '#7FBE6D', picto: '/img/pictos/haltere.png', libelle: 'Protéines' },
+  lipides: { couleur: '#FBC83B', picto: '/img/pictos/bouteille.png', libelle: 'Lipides' },
+  glucides: { couleur: '#7FBE6D', picto: '/img/pictos/cubes.png', libelle: 'Glucides' },
+  fibres: { couleur: '#7FBE6D', picto: '/img/pictos/feuille.png', libelle: 'Fibres' },
+  journee: { couleur: '#159949', picto: '/img/pictos/anneau.png', libelle: 'Journée' },
+  volume: { couleur: '#159949', picto: '/img/pictos/estomac.png', libelle: 'Volume' },
+  satiete: { couleur: '#2E6FE0', picto: '/img/pictos/chronometre.png', libelle: 'Satiété' },
+  glycemie: { couleur: '#586BDC', picto: '/img/pictos/courbe.png', libelle: 'Glycémie' },
+} as const
+
+export type NomGrandeur = keyof typeof identites
 
 export type NomCouleur = keyof typeof palette
 
@@ -44,7 +72,7 @@ const COULEUR_DU_NIVEAU: Record<Niveau, string> = {
   favorable: palette.vert,
   intermediaire: palette.orange,
   eleve: palette.rouge,
-  absent: palette.grisVide,
+  absent: palette.piste,
 }
 
 /** Traduit une position sur l'échelle en couleur. Point de passage unique. */
@@ -203,7 +231,7 @@ export function lire(nom: NomSeuil, valeur: number | null | undefined): Lecture 
   return {
     niveau,
     couleur: couleurDuNiveau(niveau),
-    couleurVide: palette.grisVide,
+    couleurVide: palette.piste,
     remplissage: remplissagePourSeuil(nom, valeur),
     libelle: libelleDuNiveau(niveau),
     unite: seuils[nom].unite,
@@ -238,6 +266,7 @@ export function borne(valeur: number, min: number, max: number): number {
 /* ------------------------------------------------------------------ */
 
 export const polices = {
+  fiche: "'Montserrat', 'Helvetica Neue', Arial, sans-serif",
   titre: "'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif",
   texte: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
   chiffre: "'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace",
@@ -269,7 +298,7 @@ export const interlignes = {
 export const rayon = '2px'
 
 /** Filets fins plutôt que cadres pleins. */
-export const filet = `1px solid ${palette.grisVide}`
+export const filet = `1px solid ${palette.piste}`
 
 /** Format réel d'une double page ouverte, en millimètres. */
 export const doublePage = { largeurMm: 400, hauteurMm: 270 } as const
@@ -328,10 +357,17 @@ export const variablesCss: Record<string, string> = {
   '--vert': palette.vert,
   '--vert-clair': palette.vertClair,
   '--orange': palette.orange,
-  '--orange-fonce': palette.orangeFonce,
-  '--rouge': palette.rouge,
-  '--gris-vide': palette.grisVide,
+    '--rouge': palette.rouge,
+  '--piste': palette.piste,
+  '--jaune': palette.jaune,
+  '--bleu': palette.bleu,
+  '--violet': palette.violet,
+  '--violet-clair': palette.violetClair,
+  '--vert-tendre': palette.vertTendre,
+  '--verdict-debut': palette.verdictDebut,
+  '--verdict-fin': palette.verdictFin,
 
+  '--police-fiche': polices.fiche,
   '--police-titre': polices.titre,
   '--police-texte': polices.texte,
   '--police-chiffre': polices.chiffre,

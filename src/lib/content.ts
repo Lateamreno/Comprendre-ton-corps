@@ -187,3 +187,55 @@ export function voisines(dp: DoublePageSituee): {
 export function cheminDP(dp: DoublePageSituee): string {
   return `/${dp.partieRef.slug}/${dp.slug}`
 }
+
+/* ------------------------------------------------------------------ */
+/* Navigation                                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ce qu'un lien de menu a besoin de savoir, et rien de plus.
+ *
+ * Le corps de la DP n'y figure pas, délibérément : le menu est un composant
+ * client, et tout ce qu'on lui passe finit sérialisé dans le HTML envoyé au
+ * navigateur. Y glisser `corps` publierait le livre entier (CLAUDE.md §2,
+ * règle 1).
+ */
+export type LienDP = {
+  numero: string
+  titre: string
+  question: string
+  chemin: string
+}
+
+export type PartieNavigable = {
+  numero: number
+  titre: string
+  slug: string
+  resume: string
+  pages: LienDP[]
+}
+
+/** Les 7 parties dans l'ordre, chacune avec ses DP publiables. */
+export function navigation(): PartieNavigable[] {
+  const publiables = dpPubliables()
+
+  return parties.map((partie) => ({
+    numero: partie.numero,
+    titre: partie.titre,
+    slug: partie.slug,
+    resume: partie.resume,
+    pages: publiables
+      .filter((dp) => dp.partie === partie.numero)
+      .map((dp) => ({
+        numero: dp.numero,
+        titre: dp.titre,
+        question: dp.question,
+        chemin: cheminDP(dp),
+      })),
+  }))
+}
+
+/** Nombre total de DP publiables, pour les compteurs. */
+export function nombrePubliables(): number {
+  return dpPubliables().length
+}

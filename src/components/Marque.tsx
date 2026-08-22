@@ -37,7 +37,7 @@ export function Anneau({ taille }: { taille: number }) {
       }}
     >
       {/* La part non remplie. */}
-      <div style={{ ...cercle, borderColor: palette.grisVide }} />
+      <div style={{ ...cercle, borderColor: palette.piste }} />
 
       {/* La part remplie : deux quarts d'anneau, soit la moitié. */}
       <div

@@ -6,7 +6,7 @@ import { STATUTS, type Statut } from '@/lib/content'
  *
  * Volontairement hors de l'échelle sémantique : vert, orange et rouge
  * désignent une position sur une échelle de valeur mesurée, jamais un état
- * de production. Le rempli est donc en --texte, le vide en --gris-vide.
+ * de production. Le rempli est donc en --texte, le vide en --piste.
  * La couleur ne porte rien seule : le libellé est toujours écrit à côté.
  */
 export function JaugeStatut({ statut }: { statut: Statut }) {
@@ -21,7 +21,7 @@ export function JaugeStatut({ statut }: { statut: Statut }) {
             style={{
               width: '10px',
               height: '4px',
-              background: i < atteint ? palette.texte : palette.grisVide,
+              background: i < atteint ? palette.texte : palette.piste,
             }}
           />
         ))}

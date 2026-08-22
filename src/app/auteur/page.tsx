@@ -27,7 +27,7 @@ export default function PageAuteur() {
         les références de cette page restent à écrire.
       </p>
 
-      <section className="mt-10 border-t border-gris-vide pt-6">
+      <section className="mt-10 border-t border-piste pt-6">
         <h2 className="chiffre text-mention uppercase tracking-wider text-texte-faible">
           Relecture médicale
         </h2>

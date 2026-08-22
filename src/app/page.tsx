@@ -12,7 +12,7 @@ export default function Accueil() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-16 md:py-24">
-      <header className="border-b border-gris-vide pb-10">
+      <header className="border-b border-piste pb-10">
         <h1 className="text-titre md:text-titre-large font-titre font-semibold">
           {site.titre}
         </h1>
@@ -44,7 +44,7 @@ export default function Accueil() {
 
               <ul className="mt-4">
                 {pagesDeLaPartie.map((dp) => (
-                  <li key={dp.fichier} className="border-t border-gris-vide py-5">
+                  <li key={dp.fichier} className="border-t border-piste py-5">
                     <Link href={cheminDP(dp)} className="group block">
                       <span className="chiffre text-legende text-texte-faible">{dp.numero}</span>
                       <h3 className="mt-1 text-intertitre font-titre font-semibold text-texte group-hover:text-vert">
@@ -60,7 +60,7 @@ export default function Accueil() {
         })
       )}
 
-      <footer className="mt-20 border-t border-gris-vide pt-6 text-legende text-texte-faible">
+      <footer className="mt-20 border-t border-piste pt-6 text-legende text-texte-faible">
         <p>
           Écrit par <Link href={auteur.chemin} className="text-vert underline underline-offset-2">{auteur.nom}</Link>.
         </p>

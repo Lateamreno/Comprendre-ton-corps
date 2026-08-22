@@ -103,10 +103,14 @@
   --color-vert: var(--vert);
   --color-vert-clair: var(--vert-clair);
   --color-orange: var(--orange);
-  --color-orange-fonce: var(--orange-fonce);
   --color-rouge: var(--rouge);
-  --color-gris-vide: var(--gris-vide);
+  --color-piste: var(--piste);
+  --color-jaune: var(--jaune);
+  --color-bleu: var(--bleu);
+  --color-violet: var(--violet);
+  --color-vert-tendre: var(--vert-tendre);
 
+  --font-fiche: var(--police-fiche);
   --font-titre: var(--police-titre);
   --font-texte: var(--police-texte);
   --font-chiffre: var(--police-chiffre);

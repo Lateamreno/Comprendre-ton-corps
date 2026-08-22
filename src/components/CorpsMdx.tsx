@@ -22,7 +22,7 @@ const composants = {
     <strong {...props} className="font-semibold text-texte" />
   ),
   ul: (props: React.ComponentProps<'ul'>) => (
-    <ul {...props} className="my-4 list-disc pl-5 marker:text-gris-vide" />
+    <ul {...props} className="my-4 list-disc pl-5 marker:text-piste" />
   ),
   li: (props: React.ComponentProps<'li'>) => <li {...props} className="my-1" />,
   a: (props: React.ComponentProps<'a'>) => (

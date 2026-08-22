@@ -47,7 +47,7 @@ export default async function PageDoublePage({ params }: { params: Promise<Param
       </nav>
 
       <article className="mt-8">
-        <header className="border-b border-gris-vide pb-8">
+        <header className="border-b border-piste pb-8">
           <span className="chiffre text-legende text-texte-faible">
             Double page {dp.numero}
           </span>
@@ -62,7 +62,7 @@ export default async function PageDoublePage({ params }: { params: Promise<Param
         <CorpsMdx source={dp.corps} />
 
         {dp.sources.length > 0 && (
-          <section className="mt-16 border-t border-gris-vide pt-6">
+          <section className="mt-16 border-t border-piste pt-6">
             <h2 className="chiffre text-mention uppercase tracking-wider text-texte-faible">
               Sources
             </h2>
@@ -99,7 +99,7 @@ export default async function PageDoublePage({ params }: { params: Promise<Param
         </section>
       </article>
 
-      <nav className="mt-16 flex justify-between gap-8 border-t border-gris-vide pt-6 text-petit">
+      <nav className="mt-16 flex justify-between gap-8 border-t border-piste pt-6 text-petit">
         {precedente ? (
           <Link href={cheminDP(precedente)} className="max-w-[45%] text-vert">
             <span className="chiffre block text-mention uppercase tracking-wider text-texte-faible">

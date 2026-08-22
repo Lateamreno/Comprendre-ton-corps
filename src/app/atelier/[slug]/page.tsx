@@ -78,7 +78,7 @@ export default async function PageSpread({ params }: { params: Promise<Params> }
         Le blanc restant indique ce qu&rsquo;il reste à écrire ; un texte rogné indique un excès.
       </p>
 
-      <nav className="mt-10 flex justify-between gap-8 border-t border-gris-vide pt-5 text-petit">
+      <nav className="mt-10 flex justify-between gap-8 border-t border-piste pt-5 text-petit">
         {precedente ? (
           <Link href={cheminAtelier(precedente)} className="max-w-[45%] text-vert">
             <span className="chiffre block text-mention uppercase tracking-wider text-texte-faible">
