@@ -5,8 +5,17 @@
 
 export const site = {
   titre: 'Comprendre ton corps avant de le changer',
-  /** Provisoire tant que le domaine n'est pas arrêté. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+  /**
+   * Le domaine, écrit ici et nulle part ailleurs. C'est lui qui fixe
+   * `metadataBase`, donc les URL canoniques de toutes les pages.
+   *
+   * L'hôte retenu est `www` : le domaine nu redirige vers lui, et une
+   * canonique doit désigner l'adresse réellement servie.
+   *
+   * NEXT_PUBLIC_SITE_URL permet de pointer ailleurs en local ou sur une
+   * preview, sans jamais toucher au code.
+   */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.comprendretoncorps.fr',
   langue: 'fr',
 } as const
 
