@@ -215,6 +215,7 @@ export type PartieNavigable = {
   titre: string
   slug: string
   resume: string
+  sousTitre?: string
   /** Toutes les DP du plan, brouillons compris. */
   pages: LienDP[]
   /** Combien sont réellement lisibles. */
@@ -247,6 +248,7 @@ export function navigation(): PartieNavigable[] {
       titre: partie.titre,
       slug: partie.slug,
       resume: partie.resume,
+      sousTitre: partie.sousTitre,
       pages,
       publiees: pages.filter((p) => p.chemin !== null).length,
     }
