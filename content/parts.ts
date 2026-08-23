@@ -16,6 +16,8 @@ export type Partie = {
   slug: string
   /** Une phrase, descriptive, pour le sommaire et les métadonnées. */
   resume: string
+  /** Sous-titre éditorial, affiché sous le titre de partie quand il existe. */
+  sousTitre?: string
   /** Ce que le lecteur sait faire en sortant de la partie. */
   acquis: string
 }
@@ -70,8 +72,9 @@ export const parties: Partie[] = [
   },
   {
     numero: 6,
-    titre: 'Alors, on fait quoi',
-    slug: 'alors-on-fait-quoi',
+    titre: 'Comment changer sans lutter',
+    slug: 'comment-changer-sans-lutter',
+    sousTitre: 'Du savoir au pouvoir',
     resume:
       "Le déficit tenable, l'assiette sans balance, les repas, les courses, le restaurant, le sommeil et le stress — ce qui reste quand on arrête de lutter.",
     acquis: "Construire des changements qui ne demandent plus de volonté.",

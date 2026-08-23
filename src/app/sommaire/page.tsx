@@ -59,6 +59,11 @@ export default function Sommaire() {
             </span>
           </div>
 
+          {partie.sousTitre && (
+            <p className="mt-2 font-titre text-petit italic text-texte-faible">
+              {partie.sousTitre}
+            </p>
+          )}
           <p className="mt-3 text-petit text-texte-faible">{partie.resume}</p>
 
           {partie.pages.length > 0 && (
