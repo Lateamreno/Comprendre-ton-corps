@@ -87,9 +87,9 @@ export const parties: Partie[] = [
     numero: 7,
     titre: 'Est-ce que ça marche vraiment',
     slug: 'est-ce-que-ca-marche-vraiment',
-    sousTitre: 'Opérations, médicaments, shakers, créatine, dopage',
+    sousTitre: 'Opérations, médicaments, dopage',
     resume:
-      "Du shaker au bypass, en escalade : ce que chaque aide fait vraiment, ce qu'elle coûte, et ce qu'on sait de l'après.",
+      "Médicaments de la faim, bypass, stéroïdes : ce que chaque aide fait vraiment, ce qu'elle coûte, et ce qu'on sait de l'après.",
     acquis: "Situer chaque aide : ce qu'elle change, et ce qu'elle ne change pas.",
   },
   {
