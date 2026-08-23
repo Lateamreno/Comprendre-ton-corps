@@ -15,7 +15,7 @@ Règle des titres : jamais l'organe ni le jargon, toujours la question vécue.
 PLAN = {
 0: [
  (1,"Pourquoi ce livre","Pourquoi un livre de plus sur l'alimentation ?",
-  "La documentation disponible prescrit ou reste illisible ; presque rien n'explique le mécanisme.",
+  "J'ai fait ces recherches pour moi ; ce livre partage ce que j'ai appris.",
   ["Deux familles de sources : les instructions, et la recherche illisible hors de sa discipline", "L'espace vide entre les deux : ce qui se passe à l'intérieur du corps", "Ce livre décrit, il ne prescrit pas — la décision appartient au lecteur"]),
  (2,"Comment lire ce livre","Comment lire ce livre ?",
   "Chaque double page se suffit à elle-même et répond à une question.",
