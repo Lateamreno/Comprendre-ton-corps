@@ -1,11 +1,12 @@
 /**
- * Les 8 parties du livre, dans l'ordre de lecture.
+ * Les 9 parties du livre, dans l'ordre de lecture.
  *
  * Chaque partie est une question que le lecteur se pose déjà, et le sommaire
  * s'adresse aux deux publics : celui qui veut perdre et celui qui n'arrive
  * pas à prendre. Les sous-titres portent ce retournement. Les parties 5 et 6
- * sont les deux échecs en miroir — l'assiette, l'effort — et la 7 leur
- * réponse commune.
+ * sont les deux échecs en miroir — l'assiette, l'effort — et la 7 décrit les grands
+ * moyens — chirurgie, médicaments, dopage — sans les juger, et la 8 est la
+ * réponse durable.
  *
  * `slug` porte le premier segment d'URL d'une double page : /[partie]/[slug].
  */
@@ -84,6 +85,15 @@ export const parties: Partie[] = [
   },
   {
     numero: 7,
+    titre: 'Que peuvent les grands moyens',
+    slug: 'que-peuvent-les-grands-moyens',
+    sousTitre: 'Chirurgie, médicaments, dopage',
+    resume:
+      "Bypass, analogues du GLP-1, stéroïdes : ce que ces interventions font vraiment, ce qu'elles laissent intact, et ce qu'on sait de l'après.",
+    acquis: "Savoir ce que les grands moyens changent — et ce qu'ils ne changent pas.",
+  },
+  {
+    numero: 8,
     titre: 'Comment changer sans lutter',
     slug: 'comment-changer-sans-lutter',
     sousTitre: 'Du savoir au pouvoir',

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Le plan du livre — huit parties, chacune une question que le lecteur se pose.
+Le plan du livre — neuf parties (0 à 8), chacune une question du lecteur.
 
-Les parties 5 et 6 sont les deux échecs en miroir — l'assiette, l'effort —
-et la 7 est l'application commune. Les sous-titres des parties (content/parts.ts)
-portent le retournement « ou pas » : la faim qui manque, ceux qui ne grossissent pas.
+Les parties 5 et 6 sont les deux échecs en miroir — l'assiette, l'effort —,
+la 7 décrit les grands moyens (chirurgie, médicaments, dopage) sans les
+juger, et la 8 est la réponse durable. Les sous-titres des parties
+(content/parts.ts) portent le retournement vers le second public.
 
 Règle des titres : jamais l'organe ni le jargon, toujours la question vécue.
 """
@@ -22,7 +23,7 @@ PLAN = {
   "Il explique des mécanismes ; il ne remplace ni un médecin ni un diagnostic.",
   ["Aucun chiffre présenté comme un objectif", "Aucune donnée sans sa source", "Les mécanismes sont décrits avec leurs limites et leurs débats ouverts", "Ce qui relève du médecin y reste"]),
  (4,"Sommaire visuel","De quoi ce livre parle-t-il, en une image ?",
-  "Le plan du livre en une planche, six questions qui s'enchaînent.",
+  "Le plan du livre en une planche, huit questions qui s'enchaînent.",
   ["Les six questions et leur enchaînement", "Ce que le lecteur sait faire au sortir de chacune"]),
 ],
 1: [
@@ -323,6 +324,26 @@ PLAN = {
   ["Les erreurs qui coûtent le plus", "Ce qui relève de l'attente, ce qui relève de la méthode"]),
 ],
 7: [
+ (1,"Les grands moyens","Quand les grands moyens entrent-ils en jeu ?",
+  "Chirurgie, médicaments, dopage : ce qu'ils sont, et où ils commencent.",
+  ["Ce que recouvre chaque famille d'intervention", "Les seuils et les parcours qui encadrent chirurgie et médicaments en France", "Pourquoi ce livre les décrit sans les recommander ni les juger"]),
+ (2,"Ce que fait une chirurgie de l'obésité","Que change un bypass ou une sleeve ?",
+  "Moins un estomac rétréci qu'un signal hormonal transformé.",
+  ["Restriction et malabsorption : la mécanique visible", "La chute de la ghréline : l'effet le moins connu et le plus puissant", "Ce que l'opération change à la faim, pas seulement à la contenance"]),
+ (3,"Après l'opération","Pourquoi peut-on reprendre du poids après une chirurgie ?",
+  "L'opération transforme les signaux ; elle ne suspend pas l'adaptation.",
+  ["Les données de reprise à cinq et dix ans", "Les mécanismes du livre qui continuent de s'appliquer", "Ce qui distingue ceux qui maintiennent"]),
+ (4,"Les médicaments de la faim","Que font les nouveaux médicaments de la perte de poids ?",
+  "Les analogues du GLP-1 imitent une hormone de satiété — et n'agissent que tant qu'ils sont là.",
+  ["Le mécanisme : une hormone de satiété prolongée", "Les pertes mesurées dans les essais cliniques", "Ce que montrent les données à l'arrêt du traitement"]),
+ (5,"Le dopage","Que fait le dopage, et à quel prix ?",
+  "Du muscle plus vite, un coût physiologique documenté.",
+  ["Ce que les stéroïdes changent à la synthèse musculaire", "Ce qui reste et ce qui part à l'arrêt", "Les coûts documentés, du cœur à la fertilité"]),
+ (6,"Récapitulatif — forcer le système","Que reste-t-il des mécanismes quand on force le système ?",
+  "Aucune intervention ne suspend les lois des parties précédentes.",
+  ["Ce que chaque intervention change, et ce qu'elle laisse intact", "Pourquoi la suite du livre s'applique aussi à ceux qui y ont recours"]),
+],
+8: [
  (1,"Rien à supprimer","Faut-il supprimer des aliments pour perdre du poids ?",
   "L'interdiction crée l'envie et prépare l'abandon.",
   ["Ce que produit une restriction cognitive", "Pourquoi les listes d'interdits échouent", "Ce que remplacer veut dire"]),
