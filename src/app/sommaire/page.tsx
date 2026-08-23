@@ -60,7 +60,7 @@ export default function Sommaire() {
           </div>
 
           {partie.sousTitre && (
-            <p className="mt-2 font-titre text-petit italic text-texte-faible">
+            <p className="mt-2 font-titre text-intertitre italic leading-snug text-texte-faible">
               {partie.sousTitre}
             </p>
           )}

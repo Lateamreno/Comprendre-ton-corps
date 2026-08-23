@@ -131,10 +131,15 @@ export function BurgerMenu({
                   <span className="chiffre text-legende text-texte-faible">
                     {partie.numero}
                   </span>
-                  <span
-                    className="flex-1 font-titre text-petit font-semibold text-texte" 
-                  >
-                    {partie.titre}
+                  <span className="flex-1">
+                    <span className="block font-titre text-petit font-semibold text-texte">
+                      {partie.titre}
+                    </span>
+                    {partie.sousTitre && (
+                      <span className="block font-titre text-legende italic text-texte-faible">
+                        {partie.sousTitre}
+                      </span>
+                    )}
                   </span>
                   <span className="chiffre text-mention text-texte-faible" aria-hidden="true">
                     {vide ? '—' : deplie ? '–' : '+'}
