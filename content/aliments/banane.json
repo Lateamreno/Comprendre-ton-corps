@@ -1,6 +1,16 @@
 {
-  "slug": "banane", "nom": "Banane", "precision": "chair sans peau, crue",
-  "image": "/img/aliments/banane.jpg", "ciqual": "13005",
-  "portion": { "grammes": 120, "libelle": "une banane moyenne" },
-  "indiceGlycemique": { "valeur": 51, "source": "Atkinson FS, Brand-Miller JC et al., International Tables of Glycemic Index and Glycemic Load Values 2021, American Journal of Clinical Nutrition" }
+  "slug": "banane",
+  "nom": "Banane",
+  "precision": "chair sans peau, crue",
+  "question": "Que contient une banane ?",
+  "image": "/img/aliments/banane.jpg",
+  "ciqual": "13005",
+  "portion": {
+    "grammes": 120,
+    "libelle": "une banane moyenne"
+  },
+  "indiceGlycemique": {
+    "valeur": 51,
+    "source": "Atkinson FS, Brand-Miller JC et al., International Tables of Glycemic Index and Glycemic Load Values 2021, American Journal of Clinical Nutrition"
+  }
 }

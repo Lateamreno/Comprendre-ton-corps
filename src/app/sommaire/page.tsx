@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { navigation, nombrePubliables } from '@/lib/content'
+import { slugsAliments } from '@/lib/aliments'
 
 export const metadata: Metadata = {
   title: 'Sommaire',
@@ -18,6 +19,7 @@ const TOTAL_PREVU = 103
 export default function Sommaire() {
   const parties = navigation()
   const publiees = nombrePubliables()
+  const nombreFiches = slugsAliments().length
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-16 md:py-24">
@@ -31,6 +33,22 @@ export default function Sommaire() {
           {publiees} publiée{publiees > 1 ? 's' : ''} sur {TOTAL_PREVU}
         </p>
       </header>
+
+      <section className="mt-12 border-b border-piste pb-6">
+        <div className="flex items-baseline gap-3 border-b border-piste pb-2">
+          <h2 className="flex-1 font-titre text-intertitre font-semibold">
+            <Link href="/fiches" className="hover:text-vert">
+              Fiches aliment
+            </Link>
+          </h2>
+          <span className="chiffre text-mention uppercase tracking-wider text-texte-faible">
+            {nombreFiches} fiches
+          </span>
+        </div>
+        <p className="mt-3 text-petit text-texte-faible">
+          Ce que contient une portion réelle, aliment par aliment.
+        </p>
+      </section>
 
       {parties.map((partie) => (
         <section key={partie.numero} className="mt-12">

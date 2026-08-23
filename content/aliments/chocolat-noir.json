@@ -1,6 +1,16 @@
 {
-  "slug": "chocolat-noir", "nom": "Chocolat noir", "precision": "70 % de cacao, tablette",
-  "image": "/img/aliments/chocolat-noir.jpg", "ciqual": "31074",
-  "portion": { "grammes": 20, "libelle": "quatre carrés" },
-  "indiceGlycemique": { "valeur": 23, "source": "Atkinson FS, Brand-Miller JC et al., International Tables of Glycemic Index and Glycemic Load Values 2021, American Journal of Clinical Nutrition" }
+  "slug": "chocolat-noir",
+  "nom": "Chocolat noir",
+  "precision": "70 % de cacao, tablette",
+  "question": "Que contient un carré de chocolat noir ?",
+  "image": "/img/aliments/chocolat-noir.jpg",
+  "ciqual": "31074",
+  "portion": {
+    "grammes": 20,
+    "libelle": "quatre carrés"
+  },
+  "indiceGlycemique": {
+    "valeur": 23,
+    "source": "Atkinson FS, Brand-Miller JC et al., International Tables of Glycemic Index and Glycemic Load Values 2021, American Journal of Clinical Nutrition"
+  }
 }

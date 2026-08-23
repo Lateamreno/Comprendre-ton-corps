@@ -102,6 +102,11 @@ export function BurgerMenu({
               Sommaire
             </Link>
           </li>
+          <li className="border-t border-piste py-3">
+            <Link href="/fiches" className="hover:text-vert">
+              Fiches aliment
+            </Link>
+          </li>
         </ul>
 
         <p className="chiffre mt-8 text-mention uppercase tracking-wider text-texte-faible">

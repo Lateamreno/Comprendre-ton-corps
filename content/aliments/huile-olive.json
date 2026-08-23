@@ -1,5 +1,12 @@
 {
-  "slug": "huile-olive", "nom": "Huile d'olive", "precision": "vierge extra",
-  "image": "/img/aliments/huile-olive.jpg", "ciqual": "17270",
-  "portion": { "grammes": 10, "libelle": "une cuillère à soupe" }
+  "slug": "huile-olive",
+  "nom": "Huile d'olive",
+  "precision": "vierge extra",
+  "question": "Que contient une cuillère d'huile d'olive ?",
+  "image": "/img/aliments/huile-olive.jpg",
+  "ciqual": "17270",
+  "portion": {
+    "grammes": 10,
+    "libelle": "une cuillère à soupe"
+  }
 }

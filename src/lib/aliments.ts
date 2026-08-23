@@ -24,6 +24,8 @@ type FicheDeclaree = {
   slug: string
   nom: string
   precision?: string
+  /** Porte le titre de la page publique et la balise <title> (CLAUDE.md §9). */
+  question?: string
   image?: string
   ciqual: string
   portion: { grammes: number; libelle: string }
@@ -43,6 +45,7 @@ export type Fiche = {
   slug: string
   nom: string
   precision: string
+  question: string
   image: string | null
   nomCiqual: string
   portion: { grammes: number; libelle: string }
@@ -105,6 +108,7 @@ export function lireFiche(slug: string): Fiche {
     slug: d.slug,
     nom: d.nom,
     precision: d.precision ?? '',
+    question: d.question ?? `Que contient ${d.nom.toLowerCase()} ?`,
     image: d.image ?? null,
     nomCiqual: a.nom,
     portion: d.portion,

@@ -1,0 +1,11 @@
+{
+  "slug": "pain-complet",
+  "nom": "Pain complet",
+  "precision": "à la farine T150",
+  "question": "Que contient une tranche de pain complet ?",
+  "ciqual": "7110",
+  "portion": {
+    "grammes": 50,
+    "libelle": "deux tranches"
+  }
+}

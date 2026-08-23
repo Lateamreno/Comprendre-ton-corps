@@ -1,0 +1,11 @@
+{
+  "slug": "pates",
+  "nom": "Pâtes",
+  "precision": "sèches, cuites, sans sel",
+  "question": "Que contient une assiette de pâtes ?",
+  "ciqual": "9811",
+  "portion": {
+    "grammes": 200,
+    "libelle": "une assiette"
+  }
+}

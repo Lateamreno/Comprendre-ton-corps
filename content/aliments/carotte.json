@@ -1,0 +1,11 @@
+{
+  "slug": "carotte",
+  "nom": "Carotte",
+  "precision": "crue",
+  "question": "Que contient une carotte ?",
+  "ciqual": "20009",
+  "portion": {
+    "grammes": 80,
+    "libelle": "une carotte"
+  }
+}

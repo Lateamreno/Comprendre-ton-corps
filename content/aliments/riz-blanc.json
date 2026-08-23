@@ -1,0 +1,11 @@
+{
+  "slug": "riz-blanc",
+  "nom": "Riz blanc",
+  "precision": "cuit, sans sel ajouté",
+  "question": "Que contient une portion de riz blanc ?",
+  "ciqual": "9104",
+  "portion": {
+    "grammes": 150,
+    "libelle": "une portion"
+  }
+}

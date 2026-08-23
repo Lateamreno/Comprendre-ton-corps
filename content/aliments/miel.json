@@ -1,0 +1,11 @@
+{
+  "slug": "miel",
+  "nom": "Miel",
+  "precision": "",
+  "question": "Que contient une cuillère de miel ?",
+  "ciqual": "31008",
+  "portion": {
+    "grammes": 20,
+    "libelle": "une cuillère à soupe"
+  }
+}

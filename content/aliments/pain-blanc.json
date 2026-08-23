@@ -1,0 +1,11 @@
+{
+  "slug": "pain-blanc",
+  "nom": "Pain blanc",
+  "precision": "baguette, boule",
+  "question": "Que contient une tranche de pain blanc ?",
+  "ciqual": "7001",
+  "portion": {
+    "grammes": 50,
+    "libelle": "deux tranches"
+  }
+}

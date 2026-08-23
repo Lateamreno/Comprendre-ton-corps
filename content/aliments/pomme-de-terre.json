@@ -1,0 +1,11 @@
+{
+  "slug": "pomme-de-terre",
+  "nom": "Pomme de terre",
+  "precision": "cuite",
+  "question": "Que contient une pomme de terre cuite ?",
+  "ciqual": "4048",
+  "portion": {
+    "grammes": 200,
+    "libelle": "deux pommes de terre"
+  }
+}

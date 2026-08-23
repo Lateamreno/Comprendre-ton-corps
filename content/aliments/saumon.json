@@ -1,0 +1,11 @@
+{
+  "slug": "saumon",
+  "nom": "Saumon",
+  "precision": "cuit à la vapeur",
+  "question": "Que contient un pavé de saumon ?",
+  "ciqual": "26038",
+  "portion": {
+    "grammes": 120,
+    "libelle": "un pavé"
+  }
+}

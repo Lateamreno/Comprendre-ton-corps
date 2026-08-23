@@ -1,0 +1,11 @@
+{
+  "slug": "amandes",
+  "nom": "Amandes",
+  "precision": "avec peau, sans sel ajouté",
+  "question": "Que contient une poignée d'amandes ?",
+  "ciqual": "15000",
+  "portion": {
+    "grammes": 30,
+    "libelle": "une poignée"
+  }
+}

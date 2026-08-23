@@ -60,6 +60,19 @@ export default function Accueil() {
         })
       )}
 
+      <section className="mt-12 border-t border-piste pt-6">
+        <h2 className="chiffre text-mention uppercase tracking-wider text-texte-faible">
+          Fiches aliment
+        </h2>
+        <p className="mt-3 text-petit text-texte-faible">
+          Ce que contient une portion réelle — énergie, sucres, fibres, et combien il en
+          faut pour 100 kcal.{' '}
+          <Link href="/fiches" className="text-vert underline underline-offset-2">
+            Voir les fiches
+          </Link>
+        </p>
+      </section>
+
       <footer className="mt-20 border-t border-piste pt-6 text-legende text-texte-faible">
         <p>
           Écrit par <Link href={auteur.chemin} className="text-vert underline underline-offset-2">{auteur.nom}</Link>.

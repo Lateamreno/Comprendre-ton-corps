@@ -2,6 +2,7 @@
   "slug": "pomme",
   "nom": "Pomme",
   "precision": "chair et peau, crue",
+  "question": "Que contient une pomme ?",
   "image": "/img/aliments/pomme.jpg",
   "ciqual": "13039",
   "portion": {

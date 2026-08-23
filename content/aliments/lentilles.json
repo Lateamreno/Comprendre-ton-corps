@@ -1,0 +1,11 @@
+{
+  "slug": "lentilles",
+  "nom": "Lentilles",
+  "precision": "bouillies, cuites à l'eau",
+  "question": "Que contient une portion de lentilles ?",
+  "ciqual": "20360",
+  "portion": {
+    "grammes": 150,
+    "libelle": "une portion"
+  }
+}
