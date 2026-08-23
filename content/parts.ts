@@ -85,12 +85,12 @@ export const parties: Partie[] = [
   },
   {
     numero: 7,
-    titre: 'Que peuvent les grands moyens',
-    slug: 'que-peuvent-les-grands-moyens',
-    sousTitre: 'Chirurgie, médicaments, dopage',
+    titre: 'Est-ce que ça marche vraiment',
+    slug: 'est-ce-que-ca-marche-vraiment',
+    sousTitre: 'Opérations, médicaments, shakers, créatine, dopage',
     resume:
-      "Bypass, analogues du GLP-1, stéroïdes : ce que ces interventions font vraiment, ce qu'elles laissent intact, et ce qu'on sait de l'après.",
-    acquis: "Savoir ce que les grands moyens changent — et ce qu'ils ne changent pas.",
+      "Du shaker au bypass, en escalade : ce que chaque aide fait vraiment, ce qu'elle coûte, et ce qu'on sait de l'après.",
+    acquis: "Situer chaque aide : ce qu'elle change, et ce qu'elle ne change pas.",
   },
   {
     numero: 8,
