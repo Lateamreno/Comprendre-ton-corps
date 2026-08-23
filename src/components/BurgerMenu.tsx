@@ -110,7 +110,8 @@ export function BurgerMenu({
         </ul>
 
         <p className="chiffre mt-8 text-mention uppercase tracking-wider text-texte-faible">
-          {total} double{total > 1 ? 's' : ''} page{total > 1 ? 's' : ''} sur 103
+          {total} lisible{total > 1 ? 's' : ''} sur{' '}
+          {parties.reduce((somme, p) => somme + p.pages.length, 0)} prévues
         </p>
 
         <ul className="mt-3">

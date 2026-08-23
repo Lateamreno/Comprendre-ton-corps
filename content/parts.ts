@@ -1,11 +1,11 @@
 /**
  * Les 7 parties du livre, dans l'ordre de lecture.
  *
- * L'ordre suit une progression : on explique d'abord ce que le corps fait
- * d'un aliment, ensuite ce que les aliments contiennent, puis ce que le corps
- * dépense, les leviers qui modifient cette dépense, le terrain qui la
- * perturbe, et enfin la perte de poids — pourquoi elle se provoque, pourquoi
- * elle échoue, et ce qui tient.
+ * Chaque partie est une question que le lecteur se pose déjà. L'ordre suit
+ * l'expérience avant la théorie : la faim qu'on ressent, le stockage qu'on
+ * subit, l'assiette qu'on remplit, la dépense qu'on surestime, l'échec qu'on
+ * a connu, et ce qui tient. Aucune page n'est rangée par organe : le corps
+ * s'explique à travers les questions, jamais l'inverse.
  *
  * `slug` porte le premier segment d'URL d'une double page : /[partie]/[slug].
  */
@@ -30,51 +30,51 @@ export const parties: Partie[] = [
   },
   {
     numero: 1,
-    titre: 'Ce qui se passe quand on mange',
-    slug: 'ce-qui-se-passe-quand-on-mange',
+    titre: 'Pourquoi on a faim',
+    slug: 'pourquoi-on-a-faim',
     resume:
-      "Le trajet d'une bouchée, de la bouche au tissu adipeux, et les signaux qui décident de son sort.",
-    acquis: "Comprendre la machine avant de juger le carburant.",
+      "La faim à heure fixe, l'envie sans besoin, le signal d'arrêt qui arrive trop tard — et ce que le sommeil et le stress y changent.",
+    acquis: "Distinguer le besoin, l'envie et l'habitude dans ses propres signaux.",
   },
   {
     numero: 2,
-    titre: 'Ce que contiennent les aliments',
-    slug: 'ce-que-contiennent-les-aliments',
+    titre: 'Pourquoi on grossit',
+    slug: 'pourquoi-on-grossit',
     resume:
-      "Macronutriments, fibres, calories, indice glycémique, degré de transformation — et ce que les étiquettes ne disent pas.",
-    acquis: "Lire un aliment autrement que par son nombre de calories.",
+      "Le trajet d'une bouchée, l'insuline qui arbitre, les réserves qui s'ouvrent et se ferment — et pourquoi toutes les calories ne se valent pas.",
+    acquis: "Comprendre par quelles routes un surplus devient du gras.",
   },
   {
     numero: 3,
-    titre: 'Ce que le corps dépense',
-    slug: 'ce-que-le-corps-depense',
+    titre: "Ce qu'il y a vraiment dans l'assiette",
+    slug: 'dans-l-assiette',
     resume:
-      "Métabolisme de base, digestion, mouvement involontaire, exercice : les quatre postes de la dépense et leurs proportions réelles.",
-    acquis: "Savoir où part l'énergie, et laquelle de ces parts se pilote.",
+      "Macronutriments, fibres, sucres cachés, étiquettes et allégations — et les tableaux qui comparent les aliments à portion réelle.",
+    acquis: "Lire un aliment autrement que par son nombre de calories.",
   },
   {
     numero: 4,
-    titre: 'Le muscle et le mouvement',
-    slug: 'le-muscle-et-le-mouvement',
+    titre: 'Ce que le corps brûle',
+    slug: 'ce-que-le-corps-brule',
     resume:
-      "Ce que fait un muscle qui grossit, ce que brûle un cardio, et ce qui distingue une pratique qui dure d'une qui s'arrête.",
-    acquis: "Choisir une activité pour ce qu'elle produit, pas pour sa réputation.",
+      "Le métabolisme et ses quatre postes, le muscle qui dépense en dormant, ce qu'une séance brûle vraiment — et la pratique qui tient.",
+    acquis: "Savoir où part l'énergie, et laquelle de ces parts se pilote.",
   },
   {
     numero: 5,
-    titre: 'Le terrain caché',
-    slug: 'le-terrain-cache',
+    titre: 'Pourquoi les régimes échouent',
+    slug: 'pourquoi-les-regimes-echouent',
     resume:
-      "Sommeil, stress, alcool, lumière, âge, cycle hormonal : ce qui agit sans passer par l'assiette.",
-    acquis: "Reconnaître les causes d'échec qui ne sont pas alimentaires.",
+      "L'adaptation, le set-point, l'effet yoyo, la volonté qui s'épuise — les mécanismes de l'échec, avant de parler de solution.",
+    acquis: "Reconnaître ce qui condamne un plan avant même de commencer.",
   },
   {
     numero: 6,
-    titre: 'Perdre du poids, et le rester',
-    slug: 'perdre-du-poids-et-le-rester',
+    titre: 'Ce qui marche vraiment',
+    slug: 'ce-qui-marche-vraiment',
     resume:
-      "Comment une perte se provoque, pourquoi elle échoue si souvent, et ce qui reste quand on arrête d'essayer fort.",
-    acquis: "Distinguer ce qui fait maigrir de ce qui fait rester mince.",
+      "Le déficit tenable, l'assiette sans balance, les repas, les courses, le restaurant, le sommeil et le stress — ce qui reste quand on arrête de lutter.",
+    acquis: "Construire des changements qui ne demandent plus de volonté.",
   },
 ]
 

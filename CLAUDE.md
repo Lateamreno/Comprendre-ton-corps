@@ -7,7 +7,7 @@ Site Next.js qui sert **deux usages sur une source unique** :
 1. **Outil de production du livre.** Chaque double page (DP) du livre est un fichier du repo. C'est ici que le contenu s'écrit et se relit — il n'y a pas d'autre base. Notion n'est plus utilisé pour ce projet.
 2. **Actif marketing et SEO.** Les mêmes contenus, tronqués, alimentent des pages publiques qui répondent aux questions que les gens se posent sur la nutrition et le métabolisme, et qui renvoient vers l'achat du livre.
 
-Le livre : 103 doubles pages, ~220 pages, 200×270 mm, couverture rigide, français, marché francophone.
+Le livre : environ 120 doubles pages — le plan dans `content/dp` fait foi, pas un nombre figé —, 200×270 mm, couverture rigide, français, marché francophone.
 
 Le site n'est **pas** le livre. La maquette finale part en PAO. Le site sert à écrire, à voir, et à capter de l'audience.
 

@@ -8,8 +8,6 @@ export const metadata: Metadata = {
   title: 'Atelier',
 }
 
-const TOTAL_PREVU = 103
-
 /** Index de production : toutes les DP du repo, brouillons compris. */
 export default function AtelierIndex() {
   const pages = toutesLesDPSituees()
@@ -30,10 +28,8 @@ export default function AtelierIndex() {
 
         <dl className="chiffre mt-6 flex flex-wrap gap-x-8 gap-y-2 text-mention uppercase tracking-wider text-texte-faible">
           <div>
-            <dt className="inline">Écrites </dt>
-            <dd className="inline text-texte">
-              {pages.length} / {TOTAL_PREVU}
-            </dd>
+            <dt className="inline">Au plan </dt>
+            <dd className="inline text-texte">{pages.length}</dd>
           </div>
           {parStatut.map(({ statut, nombre }) => (
             <div key={statut}>

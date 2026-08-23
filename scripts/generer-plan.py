@@ -15,9 +15,9 @@ DOSSIER = pathlib.Path('content/dp')
 
 # Ce qui est déjà écrit, et où ça va dans le nouveau plan.
 DEJA_ECRIT = {
-    (0, 1): '00-01-avant-propos.mdx',
-    (2, 1): '01-01-la-nourriture-est-une-information.mdx',
-    (2, 11): '01-13bis-une-calorie-nest-pas-une-calorie.mdx',
+    (0, 1): '00-01-pourquoi-ce-livre.mdx',
+    (2, 1): '02-01-manger-cest-quoi.mdx',
+    (2, 11): '02-11-une-calorie-nest-pas-une-calorie.mdx',
 }
 
 

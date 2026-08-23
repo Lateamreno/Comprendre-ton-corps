@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   alternates: { canonical: '/sommaire' },
 }
 
-const TOTAL_PREVU = 103
-
 /**
  * Le plan du livre, entièrement cliquable. Les parties encore vides restent
  * affichées : le sommaire montre autant ce qui est écrit que ce qui reste
@@ -19,6 +17,7 @@ const TOTAL_PREVU = 103
 export default function Sommaire() {
   const parties = navigation()
   const publiees = nombrePubliables()
+  const prevues = parties.reduce((somme, p) => somme + p.pages.length, 0)
   const nombreFiches = slugsAliments().length
 
   return (
@@ -26,11 +25,11 @@ export default function Sommaire() {
       <header className="border-b border-piste pb-8">
         <h1 className="text-titre md:text-titre-large font-titre font-semibold">Sommaire</h1>
         <p className="mt-4 text-texte-faible">
-          Sept parties, {TOTAL_PREVU} doubles pages. Chaque double page répond à une
+          Sept parties, {prevues} doubles pages. Chaque double page répond à une
           question et se lit indépendamment des autres.
         </p>
         <p className="chiffre mt-5 text-mention uppercase tracking-wider text-texte-faible">
-          {publiees} publiée{publiees > 1 ? 's' : ''} sur {TOTAL_PREVU}
+          {publiees} publiée{publiees > 1 ? 's' : ''} sur {prevues}
         </p>
       </header>
 

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { dpPubliables, cheminDP } from '@/lib/content'
+import { dpPubliables, cheminDP, navigation } from '@/lib/content'
 import { parties } from '@content/parts'
 import { site, auteur } from '@/lib/config'
 
@@ -9,6 +9,7 @@ import { site, auteur } from '@/lib/config'
  */
 export default function Accueil() {
   const pages = dpPubliables()
+  const prevues = navigation().reduce((somme, p) => somme + p.pages.length, 0)
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-16 md:py-24">
@@ -22,7 +23,7 @@ export default function Accueil() {
         </p>
         <p className="chiffre mt-6 text-mention uppercase tracking-wider text-texte-faible">
           {pages.length} double{pages.length > 1 ? 's' : ''} page
-          {pages.length > 1 ? 's' : ''} publiée{pages.length > 1 ? 's' : ''} sur 103
+          {pages.length > 1 ? 's' : ''} publiée{pages.length > 1 ? 's' : ''} sur {prevues} prévues
         </p>
       </header>
 

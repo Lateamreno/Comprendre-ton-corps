@@ -120,7 +120,7 @@ export type Seuil = {
  * nutritionnel simplifié de la Food Standards Agency britannique, exprimé
  * pour 100 g d'aliment solide. C'est un référentiel public, stable et
  * vérifiable, ce qui permet de juger la pomme et le croissant par la
- * même règle sur 103 doubles pages.
+ * même règle sur toutes les doubles pages.
  */
 export const seuils = {
   indiceGlycemique: {
