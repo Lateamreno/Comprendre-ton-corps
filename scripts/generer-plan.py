@@ -13,12 +13,29 @@ from plan import PLAN
 
 DOSSIER = pathlib.Path('content/dp')
 
-# Ce qui est déjà écrit, et où ça va dans le nouveau plan.
-DEJA_ECRIT = {
-    (0, 1): '00-01-pourquoi-ce-livre.mdx',
-    (2, 1): '02-01-manger-cest-quoi.mdx',
-    (2, 11): '02-11-une-calorie-nest-pas-une-calorie.mdx',
-}
+def reperer_redigees():
+    """
+    Toute DP dont le statut n'est plus « brouillon » est un texte d'auteur :
+    son corps, son statut et ses sources survivent à la régénération. Le
+    repérage se fait par (partie, ordre) lus dans le fichier lui-même —
+    aucune liste à entretenir à la main.
+    """
+    redigees = {}
+    for chemin in DOSSIER.glob('*.mdx'):
+        brut = chemin.read_text(encoding='utf-8')
+        m = re.match(r'^---\n(.*?)\n---', brut, re.S)
+        if not m:
+            continue
+        tete = m.group(1)
+        statut = re.search(r'^statut:\s*"([^"]+)"', tete, re.M)
+        partie = re.search(r'^partie:\s*(\d+)', tete, re.M)
+        ordre = re.search(r'^ordre:\s*(\d+)', tete, re.M)
+        if statut and partie and ordre and statut.group(1) != 'brouillon':
+            redigees[(int(partie.group(1)), int(ordre.group(1)))] = chemin.name
+    return redigees
+
+
+DEJA_ECRIT = reperer_redigees()
 
 
 def slugifier(t: str) -> str:
@@ -29,8 +46,16 @@ def slugifier(t: str) -> str:
     return re.sub(r'-+', '-', t).strip('-')
 
 
+def liste_yaml(tete: str, champ: str):
+    """Les entrées du bloc « champ: » uniquement — pas celles des autres listes."""
+    m = re.search(rf'^{champ}:\n((?:\s+-\s+"[^"\n]*"\n?)*)', tete, re.M)
+    if not m:
+        return []
+    return re.findall(r'-\s+"([^"]+)"', m.group(1))
+
+
 def corps_existant(nom: str):
-    """Rend (corps, statut, sources) d'une DP déjà rédigée."""
+    """Rend (corps, statut, sources, picto) d'une DP déjà rédigée."""
     chemin = DOSSIER / nom
     if not chemin.exists():
         return None
@@ -40,15 +65,14 @@ def corps_existant(nom: str):
         return None
     tete, corps = m.group(1), m.group(2).strip()
     statut = re.search(r'^statut:\s*"([^"]+)"', tete, re.M)
-    sources = re.findall(r'^\s+-\s+"([^"]+)"', tete, re.M)
-    return corps, (statut.group(1) if statut else 'ecrit'), sources
+    return corps, (statut.group(1) if statut else 'ecrit'), liste_yaml(tete, 'sources'), liste_yaml(tete, 'picto')
 
 
-def bloc_sources(sources):
-    if not sources:
-        return 'sources: []'
-    lignes = '\n'.join(f'  - "{s}"' for s in sources)
-    return f'sources:\n{lignes}'
+def bloc_liste(champ, valeurs):
+    if not valeurs:
+        return f'{champ}: []'
+    lignes = '\n'.join(f'  - "{v}"' for v in valeurs)
+    return f'{champ}:\n{lignes}'
 
 
 anciens = {p.name for p in DOSSIER.glob('*.mdx')}
@@ -64,11 +88,12 @@ for partie, entrees in sorted(PLAN.items()):
         existant = corps_existant(DEJA_ECRIT.get((partie, ordre), '')) if (partie, ordre) in DEJA_ECRIT else None
 
         if existant:
-            corps, statut, sources = existant
+            corps, statut, sources, picto = existant
             compte['repris'] += 1
         else:
             statut = 'brouillon'
             sources = []
+            picto = []
             puces = '\n'.join(f'- {i}' for i in idees)
             corps = (
                 f'> **Question** — {question}\n\n'
@@ -92,8 +117,8 @@ for partie, entrees in sorted(PLAN.items()):
             f'statut: "{statut}"\n'
             'extrait_ratio: 0.15\n'
             f'resume: "{resume}"\n'
-            f'{bloc_sources(sources)}\n'
-            'picto: []\n'
+            f"{bloc_liste('sources', sources)}\n"
+            f"{bloc_liste('picto', picto)}\n"
             '---\n\n'
         )
         (DOSSIER / nom).write_text(tete + corps + '\n', encoding='utf-8')
