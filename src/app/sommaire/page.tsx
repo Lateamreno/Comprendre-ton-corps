@@ -56,11 +56,7 @@ export default function Sommaire() {
             <span className="chiffre text-legende text-texte-faible">{partie.numero}</span>
             <h2 className="flex-1 font-titre text-intertitre font-semibold">{partie.titre}</h2>
             <span className="chiffre text-mention uppercase tracking-wider text-texte-faible">
-              {partie.pages.length === 0
-                ? 'à écrire'
-                : `${partie.pages.length} double${partie.pages.length > 1 ? 's' : ''} page${
-                    partie.pages.length > 1 ? 's' : ''
-                  }`}
+              {partie.publiees} / {partie.pages.length} écrites
             </span>
           </div>
 
@@ -68,17 +64,32 @@ export default function Sommaire() {
 
           {partie.pages.length > 0 && (
             <ul className="mt-4">
-              {partie.pages.map((dp) => (
-                <li key={dp.chemin} className="border-t border-piste py-4">
-                  <Link href={dp.chemin} className="group block">
+              {partie.pages.map((dp) => {
+                const contenu = (
+                  <>
                     <span className="chiffre text-legende text-texte-faible">{dp.numero}</span>
-                    <h3 className="mt-1 font-titre text-petit font-semibold text-texte group-hover:text-vert">
+                    <h3
+                      className={`mt-1 font-titre text-petit font-semibold ${
+                        dp.chemin === null ? 'text-texte-faible' : 'text-texte group-hover:text-vert'
+                      }`}
+                    >
                       {dp.titre}
                     </h3>
                     <p className="mt-1 text-petit text-texte-faible">{dp.question}</p>
-                  </Link>
-                </li>
-              ))}
+                  </>
+                )
+                return (
+                  <li key={dp.numero + dp.titre} className="border-t border-piste py-4">
+                    {dp.chemin === null ? (
+                      <div className="block">{contenu}</div>
+                    ) : (
+                      <Link href={dp.chemin} className="group block">
+                        {contenu}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           )}
         </section>

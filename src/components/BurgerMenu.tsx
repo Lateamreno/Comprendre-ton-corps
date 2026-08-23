@@ -30,7 +30,7 @@ export function BurgerMenu({
 
   // La partie de la page courante s'ouvre, et se referme quand on la quitte.
   const partieCourante = parties.find((p) =>
-    p.pages.some((dp) => dp.chemin === chemin),
+    p.pages.some((dp) => dp.chemin !== null && dp.chemin === chemin),
   )?.numero
 
   useEffect(() => {
@@ -131,35 +131,45 @@ export function BurgerMenu({
                     {partie.numero}
                   </span>
                   <span
-                    className={`flex-1 font-titre text-petit font-semibold ${
-                      vide ? 'text-texte-faible' : 'text-texte'
-                    }`}
+                    className="flex-1 font-titre text-petit font-semibold text-texte" 
                   >
                     {partie.titre}
                   </span>
                   <span className="chiffre text-mention text-texte-faible" aria-hidden="true">
-                    {vide ? 'à écrire' : deplie ? '–' : '+'}
+                    {vide ? '—' : deplie ? '–' : '+'}
                   </span>
                 </button>
 
                 {deplie && !vide && (
                   <ul className="pb-3 pl-7">
                     {partie.pages.map((dp) => {
-                      const courante = dp.chemin === chemin
+                      const courante = dp.chemin !== null && dp.chemin === chemin
+                      const numero = (
+                        <span className="chiffre mr-2 text-mention text-texte-faible">
+                          {dp.numero}
+                        </span>
+                      )
+
                       return (
-                        <li key={dp.chemin} className="py-1.5">
-                          <Link
-                            href={dp.chemin}
-                            aria-current={courante ? 'page' : undefined}
-                            className={`block text-petit leading-snug ${
-                              courante ? 'text-vert' : 'text-texte hover:text-vert'
-                            }`}
-                          >
-                            <span className="chiffre mr-2 text-mention text-texte-faible">
-                              {dp.numero}
+                        <li key={dp.numero + dp.titre} className="py-1.5">
+                          {dp.chemin === null ? (
+                            // Le plan se lit, le brouillon ne se publie pas.
+                            <span className="block text-petit leading-snug text-texte-faible">
+                              {numero}
+                              {dp.titre}
                             </span>
-                            {dp.titre}
-                          </Link>
+                          ) : (
+                            <Link
+                              href={dp.chemin}
+                              aria-current={courante ? 'page' : undefined}
+                              className={`block text-petit leading-snug ${
+                                courante ? 'text-vert' : 'text-texte hover:text-vert'
+                              }`}
+                            >
+                              {numero}
+                              {dp.titre}
+                            </Link>
+                          )}
                         </li>
                       )
                     })}

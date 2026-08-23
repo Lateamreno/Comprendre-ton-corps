@@ -1,9 +1,13 @@
 /**
- * Les 7 parties du livre, dans l'ordre.
+ * Les 7 parties du livre, dans l'ordre de lecture.
  *
- * `slug` porte le premier segment d'URL d'une double page :
- * /[partie]/[slug]. Les titres sont provisoires et restent à arrêter avec
- * l'auteur ; le numéro et l'ordre, eux, sont structurels.
+ * L'ordre suit une progression : on explique d'abord ce que le corps fait
+ * d'un aliment, ensuite ce que les aliments contiennent, puis ce que le corps
+ * dépense, les leviers qui modifient cette dépense, le terrain qui la
+ * perturbe, et enfin la perte de poids — pourquoi elle se provoque, pourquoi
+ * elle échoue, et ce qui tient.
+ *
+ * `slug` porte le premier segment d'URL d'une double page : /[partie]/[slug].
  */
 
 export type Partie = {
@@ -12,6 +16,8 @@ export type Partie = {
   slug: string
   /** Une phrase, descriptive, pour le sommaire et les métadonnées. */
   resume: string
+  /** Ce que le lecteur sait faire en sortant de la partie. */
+  acquis: string
 }
 
 export const parties: Partie[] = [
@@ -20,42 +26,55 @@ export const parties: Partie[] = [
     titre: 'Avant-propos',
     slug: 'avant-propos',
     resume: "Ce que ce livre explique, et ce qu'il laisse au lecteur.",
+    acquis: "Savoir ce que le livre fait et ce qu'il ne fait pas.",
   },
   {
     numero: 1,
-    titre: "L'énergie",
-    slug: 'energie',
-    resume: "Ce que mesure une calorie, et ce qu'elle ne mesure pas.",
+    titre: 'Ce qui se passe quand on mange',
+    slug: 'ce-qui-se-passe-quand-on-mange',
+    resume:
+      "Le trajet d'une bouchée, de la bouche au tissu adipeux, et les signaux qui décident de son sort.",
+    acquis: "Comprendre la machine avant de juger le carburant.",
   },
   {
     numero: 2,
-    titre: 'La digestion',
-    slug: 'digestion',
-    resume: "Le trajet d'un aliment, de la bouche à la circulation sanguine.",
+    titre: 'Ce que contiennent les aliments',
+    slug: 'ce-que-contiennent-les-aliments',
+    resume:
+      "Macronutriments, fibres, calories, indice glycémique, degré de transformation — et ce que les étiquettes ne disent pas.",
+    acquis: "Lire un aliment autrement que par son nombre de calories.",
   },
   {
     numero: 3,
-    titre: 'Le stockage',
-    slug: 'stockage',
-    resume: 'Où va ce qui entre, et sous quelles conditions il en ressort.',
+    titre: 'Ce que le corps dépense',
+    slug: 'ce-que-le-corps-depense',
+    resume:
+      "Métabolisme de base, digestion, mouvement involontaire, exercice : les quatre postes de la dépense et leurs proportions réelles.",
+    acquis: "Savoir où part l'énergie, et laquelle de ces parts se pilote.",
   },
   {
     numero: 4,
-    titre: 'La faim',
-    slug: 'faim',
-    resume: 'Les signaux qui déclenchent et arrêtent la prise alimentaire.',
+    titre: 'Le muscle et le mouvement',
+    slug: 'le-muscle-et-le-mouvement',
+    resume:
+      "Ce que fait un muscle qui grossit, ce que brûle un cardio, et ce qui distingue une pratique qui dure d'une qui s'arrête.",
+    acquis: "Choisir une activité pour ce qu'elle produit, pas pour sa réputation.",
   },
   {
     numero: 5,
-    titre: 'Le métabolisme',
-    slug: 'metabolisme',
-    resume: "La dépense d'un corps au repos et ses variations.",
+    titre: 'Le terrain caché',
+    slug: 'le-terrain-cache',
+    resume:
+      "Sommeil, stress, alcool, lumière, âge, cycle hormonal : ce qui agit sans passer par l'assiette.",
+    acquis: "Reconnaître les causes d'échec qui ne sont pas alimentaires.",
   },
   {
     numero: 6,
-    titre: 'Les aliments',
-    slug: 'aliments',
-    resume: 'Des fiches de lecture rapide, construites sur la même grille.',
+    titre: 'Perdre du poids, et le rester',
+    slug: 'perdre-du-poids-et-le-rester',
+    resume:
+      "Comment une perte se provoque, pourquoi elle échoue si souvent, et ce qui reste quand on arrête d'essayer fort.",
+    acquis: "Distinguer ce qui fait maigrir de ce qui fait rester mince.",
   },
 ]
 

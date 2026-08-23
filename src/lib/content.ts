@@ -87,11 +87,12 @@ function analyser(fichier: string, brut: string): DoublePage {
   }
 
   // Aucune donnée nutritionnelle ne paraît sans source (CLAUDE.md §11).
-  // Les parties de contenu citent donc au moins une référence ; la partie 0,
-  // liminaire, ne porte pas de données.
+  // La contrainte porte sur ce qui sort : une DP au statut « brouillon » n'est
+  // pas publiée, et une page de plan n'a pas encore ses références. Rien ne
+  // peut en revanche devenir publiable sans elles.
   const sources = champListe(donnees, 'sources', fichier)
-  if (partie > 0 && sources.length === 0) {
-    erreur(fichier, 'au moins une source est obligatoire (CLAUDE.md §11).')
+  if (partie > 0 && statut !== 'brouillon' && sources.length === 0) {
+    erreur(fichier, 'au moins une source est obligatoire pour publier (CLAUDE.md §11).')
   }
 
   return {
@@ -204,7 +205,9 @@ export type LienDP = {
   numero: string
   titre: string
   question: string
-  chemin: string
+  /** null tant que la DP est au statut brouillon : le plan se voit, la page non. */
+  chemin: string | null
+  statut: Statut
 }
 
 export type PartieNavigable = {
@@ -212,27 +215,42 @@ export type PartieNavigable = {
   titre: string
   slug: string
   resume: string
+  /** Toutes les DP du plan, brouillons compris. */
   pages: LienDP[]
+  /** Combien sont réellement lisibles. */
+  publiees: number
 }
 
-/** Les 7 parties dans l'ordre, chacune avec ses DP publiables. */
+/**
+ * Les 7 parties dans l'ordre, avec tout le plan — brouillons compris.
+ *
+ * Le plan se montre, mais une DP au statut brouillon n'a pas de chemin : elle
+ * s'affiche sans être cliquable. C'est ce qui permet au menu de servir à
+ * écrire autant qu'à lire, sans jamais publier un brouillon (CLAUDE.md §11).
+ */
 export function navigation(): PartieNavigable[] {
-  const publiables = dpPubliables()
+  const toutes = toutesLesDP()
 
-  return parties.map((partie) => ({
-    numero: partie.numero,
-    titre: partie.titre,
-    slug: partie.slug,
-    resume: partie.resume,
-    pages: publiables
+  return parties.map((partie) => {
+    const pages = toutes
       .filter((dp) => dp.partie === partie.numero)
       .map((dp) => ({
         numero: dp.numero,
         titre: dp.titre,
         question: dp.question,
-        chemin: cheminDP(dp),
-      })),
-  }))
+        chemin: dp.statut === 'brouillon' ? null : `/${partie.slug}/${dp.slug}`,
+        statut: dp.statut,
+      }))
+
+    return {
+      numero: partie.numero,
+      titre: partie.titre,
+      slug: partie.slug,
+      resume: partie.resume,
+      pages,
+      publiees: pages.filter((p) => p.chemin !== null).length,
+    }
+  })
 }
 
 /** Nombre total de DP publiables, pour les compteurs. */
