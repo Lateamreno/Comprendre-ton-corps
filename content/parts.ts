@@ -1,11 +1,11 @@
 /**
- * Les 7 parties du livre, dans l'ordre de lecture.
+ * Les 8 parties du livre, dans l'ordre de lecture.
  *
- * Chaque partie est une question que le lecteur se pose déjà. L'ordre suit
- * l'expérience avant la théorie : la faim qu'on ressent, le stockage qu'on
- * subit, l'assiette qu'on remplit, la dépense qu'on surestime, l'échec qu'on
- * a connu, et ce qui tient. Aucune page n'est rangée par organe : le corps
- * s'explique à travers les questions, jamais l'inverse.
+ * Chaque partie est une question que le lecteur se pose déjà, et le sommaire
+ * s'adresse aux deux publics : celui qui veut perdre et celui qui n'arrive
+ * pas à prendre. Les sous-titres portent ce retournement. Les parties 5 et 6
+ * sont les deux échecs en miroir — l'assiette, l'effort — et la 7 leur
+ * réponse commune.
  *
  * `slug` porte le premier segment d'URL d'une double page : /[partie]/[slug].
  */
@@ -34,49 +34,60 @@ export const parties: Partie[] = [
     numero: 1,
     titre: 'Pourquoi on a faim',
     slug: 'pourquoi-on-a-faim',
+    sousTitre: 'Et pourquoi elle vient parfois à manquer',
     resume:
-      "La faim à heure fixe, l'envie sans besoin, le signal d'arrêt qui arrive trop tard — et ce que le sommeil et le stress y changent.",
+      "La faim à heure fixe, l'envie sans besoin, le signal d'arrêt qui arrive trop tard — et l'appétit qui s'éteint chez certains.",
     acquis: "Distinguer le besoin, l'envie et l'habitude dans ses propres signaux.",
   },
   {
     numero: 2,
     titre: 'Pourquoi on grossit',
+    sousTitre: 'Et pourquoi certains ne grossissent jamais',
     slug: 'pourquoi-on-grossit',
     resume:
-      "Le trajet d'une bouchée, l'insuline qui arbitre, les réserves qui s'ouvrent et se ferment — et pourquoi toutes les calories ne se valent pas.",
-    acquis: "Comprendre par quelles routes un surplus devient du gras.",
+      "Le trajet d'une bouchée, l'insuline qui arbitre, les réserves qui s'ouvrent et se ferment — et le mangeur qui ne prend pas un gramme.",
+    acquis: "Comprendre par quelles routes un surplus devient du gras, ou pas.",
   },
   {
     numero: 3,
-    titre: "Qu'est-ce qu'on mange vraiment",
-    slug: 'ce-qu-on-mange-vraiment',
+    titre: "Qu'est-ce qu'on devrait manger",
+    slug: 'ce-qu-on-devrait-manger',
+    sousTitre: "Et ce qu'on gagnerait à éviter",
     resume:
       "Macronutriments, fibres, sucres cachés, étiquettes et allégations — et les tableaux qui comparent les aliments à portion réelle.",
     acquis: "Lire un aliment autrement que par son nombre de calories.",
   },
   {
     numero: 4,
-    titre: 'Où partent les calories',
-    slug: 'ou-partent-les-calories',
+    titre: 'Comment le corps brûle des graisses et prend du muscle',
+    slug: 'comment-le-corps-brule-et-se-muscle',
     resume:
-      "Le métabolisme et ses quatre postes, le muscle qui dépense en dormant, ce qu'une séance brûle vraiment — et la pratique qui tient.",
-    acquis: "Savoir où part l'énergie, et laquelle de ces parts se pilote.",
+      "Le métabolisme et ses quatre postes, le muscle qui dépense en dormant, ce qu'une séance brûle vraiment — et comment un muscle se construit.",
+    acquis: "Savoir où part l'énergie, et ce que l'entraînement peut réellement ajouter.",
   },
   {
     numero: 5,
     titre: 'Pourquoi les régimes échouent',
     slug: 'pourquoi-les-regimes-echouent',
     resume:
-      "L'adaptation, le set-point, l'effet yoyo, la volonté qui s'épuise — les mécanismes de l'échec, avant de parler de solution.",
+      "L'adaptation, le set-point, l'effet yoyo, la volonté qui s'épuise — les mécanismes de l'échec côté assiette.",
     acquis: "Reconnaître ce qui condamne un plan avant même de commencer.",
   },
   {
     numero: 6,
+    titre: "Pourquoi l'entraînement échoue",
+    slug: 'pourquoi-l-entrainement-echoue',
+    resume:
+      "Courir sans maigrir, soulever sans grossir : les mécanismes qui séparent l'effort du résultat.",
+    acquis: "Diagnostiquer pourquoi l'effort ne produit pas le résultat attendu.",
+  },
+  {
+    numero: 7,
     titre: 'Comment changer sans lutter',
     slug: 'comment-changer-sans-lutter',
     sousTitre: 'Du savoir au pouvoir',
     resume:
-      "Le déficit tenable, l'assiette sans balance, les repas, les courses, le restaurant, le sommeil et le stress — ce qui reste quand on arrête de lutter.",
+      "Le déficit tenable ou le surplus utile, l'assiette sans balance, les repas, les courses, le restaurant — ce qui reste quand on arrête de lutter.",
     acquis: "Construire des changements qui ne demandent plus de volonté.",
   },
 ]

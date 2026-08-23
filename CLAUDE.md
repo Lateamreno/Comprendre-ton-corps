@@ -43,7 +43,7 @@ Ces cinq points ne se négocient pas. Toute proposition qui les contredit doit �
 │   │   └── ...                          # une DP = un fichier
 │   ├── aliments/                        # référentiel des fiches aliment
 │   │   └── pomme.json
-│   └── parts.ts                         # les 7 parties, ordre et titres
+│   └── parts.ts                         # les 8 parties, ordre et titres
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx
@@ -76,7 +76,7 @@ Frontmatter obligatoire :
 ```yaml
 ---
 numero: "1.13bis"            # identifiant éditorial, peut contenir bis/ter
-partie: 1                    # 0 à 6
+partie: 1                    # 0 à 7
 ordre: 27                    # position dans la partie
 titre: "Une calorie n'est pas une calorie"
 question: "Pourquoi toutes les calories ne se valent pas ?"
