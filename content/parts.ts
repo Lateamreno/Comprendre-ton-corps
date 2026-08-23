@@ -46,16 +46,16 @@ export const parties: Partie[] = [
   },
   {
     numero: 3,
-    titre: "Ce qu'il y a vraiment dans l'assiette",
-    slug: 'dans-l-assiette',
+    titre: "Qu'est-ce qu'on mange vraiment",
+    slug: 'ce-qu-on-mange-vraiment',
     resume:
       "Macronutriments, fibres, sucres cachés, étiquettes et allégations — et les tableaux qui comparent les aliments à portion réelle.",
     acquis: "Lire un aliment autrement que par son nombre de calories.",
   },
   {
     numero: 4,
-    titre: 'Ce que le corps brûle',
-    slug: 'ce-que-le-corps-brule',
+    titre: 'Où partent les calories',
+    slug: 'ou-partent-les-calories',
     resume:
       "Le métabolisme et ses quatre postes, le muscle qui dépense en dormant, ce qu'une séance brûle vraiment — et la pratique qui tient.",
     acquis: "Savoir où part l'énergie, et laquelle de ces parts se pilote.",
@@ -70,8 +70,8 @@ export const parties: Partie[] = [
   },
   {
     numero: 6,
-    titre: 'Ce qui marche vraiment',
-    slug: 'ce-qui-marche-vraiment',
+    titre: 'Alors, on fait quoi',
+    slug: 'alors-on-fait-quoi',
     resume:
       "Le déficit tenable, l'assiette sans balance, les repas, les courses, le restaurant, le sommeil et le stress — ce qui reste quand on arrête de lutter.",
     acquis: "Construire des changements qui ne demandent plus de volonté.",
