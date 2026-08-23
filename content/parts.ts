@@ -52,7 +52,7 @@ export const parties: Partie[] = [
     numero: 3,
     titre: "Qu'est-ce qu'on devrait manger",
     slug: 'ce-qu-on-devrait-manger',
-    sousTitre: "Et ce qu'on gagnerait à éviter",
+    sousTitre: "Et ce qu'on devrait éviter",
     resume:
       "Macronutriments, fibres, sucres cachés, étiquettes et allégations — et les tableaux qui comparent les aliments à portion réelle.",
     acquis: "Lire un aliment autrement que par son nombre de calories.",
@@ -75,8 +75,9 @@ export const parties: Partie[] = [
   },
   {
     numero: 6,
-    titre: "Pourquoi l'entraînement échoue",
-    slug: 'pourquoi-l-entrainement-echoue',
+    titre: 'Pourquoi je ne vois pas de résultats',
+    slug: 'pourquoi-je-ne-vois-pas-de-resultats',
+    sousTitre: 'Malgré le sport',
     resume:
       "Courir sans maigrir, soulever sans grossir : les mécanismes qui séparent l'effort du résultat.",
     acquis: "Diagnostiquer pourquoi l'effort ne produit pas le résultat attendu.",
