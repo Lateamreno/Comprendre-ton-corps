@@ -1,0 +1,5 @@
+{
+  "slug": "oeuf", "nom": "Œuf", "precision": "entier, cuit dur",
+  "image": "/img/aliments/oeuf.jpg", "ciqual": "22010",
+  "portion": { "grammes": 60, "libelle": "un œuf" }
+}

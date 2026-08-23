@@ -1,0 +1,6 @@
+{
+  "slug": "flocons-avoine", "nom": "Flocons d'avoine", "precision": "bouillis, cuits à l'eau",
+  "image": "/img/aliments/flocons-avoine.jpg", "ciqual": "9313",
+  "portion": { "grammes": 200, "libelle": "un bol" },
+  "indiceGlycemique": { "valeur": 55, "source": "Atkinson FS, Brand-Miller JC et al., International Tables of Glycemic Index and Glycemic Load Values 2021, American Journal of Clinical Nutrition" }
+}

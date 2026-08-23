@@ -60,7 +60,7 @@ export function BurgerMenu({
         aria-expanded={ouvert}
         aria-controls="menu-principal"
         aria-label={ouvert ? 'Fermer le menu' : 'Ouvrir le menu'}
-        className="fixed left-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-[2px] border border-piste bg-fond-carte"
+        className="fixed right-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-[2px] border border-piste bg-fond-carte"
       >
         <span className="relative block h-[13px] w-[19px]" aria-hidden="true">
           <span
@@ -89,7 +89,7 @@ export function BurgerMenu({
       <nav
         id="menu-principal"
         hidden={!ouvert}
-        className="fixed left-0 top-0 z-40 h-full w-full max-w-[380px] overflow-y-auto border-r border-piste bg-fond-carte px-6 pb-10 pt-20"
+        className="fixed right-0 top-0 z-40 h-full w-full max-w-[380px] overflow-y-auto border-l border-piste bg-fond-carte px-6 pb-10 pt-20"
       >
         <ul className="chiffre text-mention uppercase tracking-wider text-texte-faible">
           <li className="border-t border-piste py-3">
