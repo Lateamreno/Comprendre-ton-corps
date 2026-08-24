@@ -161,7 +161,8 @@ export function Spread({ dp }: { dp: DoublePageSituee }) {
               fontWeight: 600,
               lineHeight: 1.05,
               margin: `${mm(3)} 0 0`,
-              maxWidth: '62%',
+              // Le titre reste sur la page de gauche : il ne franchit pas la pliure.
+              maxWidth: '46%',
             }}
           >
             {dp.titre}
