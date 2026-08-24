@@ -92,42 +92,120 @@ export function FigureVidange() {
   )
 }
 
-/** Les trois signaux d'arrêt, sur l'heure qui suit le début du repas. */
+/**
+ * Ce qui s'accumule pendant un repas jusqu'à ce qu'on s'arrête.
+ *
+ * Le point de la figure : le rassasiement n'est pas un interrupteur qu'un
+ * signal actionnerait. C'est une somme. Les trois apports s'empilent, la
+ * courbe du dessus est leur total, et c'est ce total qui doit atteindre un
+ * certain niveau pour que le repas s'arrête. Un seul des trois n'y suffit
+ * jamais — et le volume, lui, se retire en route.
+ *
+ * Les allures sont schématiques : aucune de ces contributions ne se mesure
+ * en unités, la légende le dit.
+ */
 export function FigureSignaux() {
-  const x = (min: number) => 112 + (min / 60) * 208
-  const rangs = [
-    { nom: 'Le volume', couleur: identites.volume.couleur, debut: 0, plein: 30, fondu: 45, y: 34 },
-    { nom: 'Les hormones', couleur: identites.satiete.couleur, debut: 12, plein: 60, fondu: 60, y: 78, rampe: 20 },
-    { nom: "L'absorption", couleur: identites.energie.couleur, debut: 30, plein: 60, fondu: 60, y: 122 },
+  const x = (min: number) => 42 + (min / 60) * 268
+  const y = (part: number) => 150 - part * 98
+
+  /* Le volume monte dès la première bouchée, puis reflue avec la vidange. */
+  const volume = (t: number) =>
+    t <= 25 ? 0.45 * Math.min(1, t / 10) ** 0.85 : 0.45 - ((t - 25) / 35) * 0.23
+
+  /* Les hormones intestinales attendent que la digestion commence. */
+  const hormones = (t: number) =>
+    t <= 8 ? 0 : t >= 30 ? 0.45 : 0.45 * ((t - 8) / 22) ** 1.1
+
+  /* L'absorption confirme, en dernier. */
+  const absorption = (t: number) => (t <= 25 ? 0 : 0.3 * ((t - 25) / 35) ** 1.2)
+
+  const cumuls = [
+    () => 0,
+    volume,
+    (t: number) => volume(t) + hormones(t),
+    (t: number) => volume(t) + hormones(t) + absorption(t),
+  ]
+
+  const instants = Array.from({ length: 49 }, (_, i) => (i * 60) / 48)
+
+  const aire = (bas: (t: number) => number, haut: (t: number) => number) => {
+    const dessus = instants.map((t) => `${x(t).toFixed(1)} ${y(haut(t)).toFixed(1)}`)
+    const dessous = [...instants].reverse().map((t) => `${x(t).toFixed(1)} ${y(bas(t)).toFixed(1)}`)
+    return `M${dessus.join(' L')} L${dessous.join(' L')} Z`
+  }
+
+  const total = cumuls[3]
+  /* Le niveau où le total suffit : atteint vers vingt minutes. */
+  const seuil = total(20)
+
+  const couches = [
+    { nom: 'le volume', couleur: identites.volume.couleur, bas: cumuls[0], haut: cumuls[1] },
+    { nom: 'les hormones', couleur: identites.satiete.couleur, bas: cumuls[1], haut: cumuls[2] },
+    { nom: "l'absorption", couleur: identites.energie.couleur, bas: cumuls[2], haut: cumuls[3] },
   ]
 
   return (
-    <Figure legende="Les trois signaux qui arrêtent un repas, sur l'heure qui suit la première bouchée. Le volume parle tout de suite mais s'éteint ; les hormones intestinales demandent une quinzaine de minutes ; l'absorption arrive en dernier. Vers vingt minutes, le message est complet.">
-      <svg viewBox="0 0 340 185" style={{ width: '88%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
-        aria-label="Chronologie des trois signaux de satiété après le début d'un repas">
-        {rangs.map((r) => (
-          <g key={r.nom}>
-            <text x="104" y={r.y + 11} textAnchor="end" style={{ ...styleEtiquette, fill: palette.texte }}>
-              {r.nom}
-            </text>
-            {r.rampe !== undefined && (
-              <rect x={x(r.debut)} y={r.y} width={x(r.rampe) - x(r.debut)} height="15" rx="2"
-                fill={r.couleur} opacity="0.35" />
-            )}
-            <rect x={x(r.rampe ?? r.debut)} y={r.y} width={x(r.plein) - x(r.rampe ?? r.debut)}
-              height="15" rx="2" fill={r.couleur} />
-            {r.fondu < 60 && (
-              <rect x={x(r.plein)} y={r.y} width={x(r.fondu) - x(r.plein)} height="15" rx="2"
-                fill={r.couleur} opacity="0.35" />
-            )}
-          </g>
+    <Figure legende="Ce qui s'accumule après la première bouchée : les trois apports s'empilent, la ligne du dessus est leur total. On ne s'arrête ni au premier ni au dernier, mais quand la somme atteint le niveau suffisant. Allures schématiques.">
+      <svg viewBox="0 0 340 190" style={{ width: '88%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Les trois contributions au signal d'arrêt s'additionnent et atteignent le niveau suffisant vers vingt minutes">
+        {couches.map((c) => (
+          <path key={c.nom} d={aire(c.bas, c.haut)} fill={c.couleur} opacity="0.9" />
         ))}
-        <line x1={x(20)} x2={x(20)} y1="22" y2="152" stroke={palette.texteFaible}
-          strokeWidth="1.2" strokeDasharray="4 4" />
-        <text x={x(20)} y="16" textAnchor="middle" style={stylePetit}>≈ 20 min</text>
+
+        {/* Le total : c'est lui qui décide. */}
+        <path
+          d={`M${instants.map((t) => `${x(t).toFixed(1)} ${y(total(t)).toFixed(1)}`).join(' L')}`}
+          fill="none"
+          stroke={palette.texte}
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+
+        {/* Le niveau suffisant, et le moment où le total l'atteint. */}
+        <line x1={x(0)} x2={x(60)} y1={y(seuil)} y2={y(seuil)} stroke={palette.texte}
+          strokeWidth="1" strokeDasharray="5 4" />
+        <text x={x(1)} y={y(seuil) - 17} style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+          assez pour
+        </text>
+        <text x={x(1)} y={y(seuil) - 7} style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+          s&rsquo;arrêter
+        </text>
+        <line x1={x(20)} x2={x(20)} y1="42" y2="150" stroke={palette.texte}
+          strokeWidth="1" strokeDasharray="5 4" />
+        <text x={x(20)} y="36" textAnchor="middle" style={{ ...stylePetit, fill: palette.texte }}>
+          ≈ 20 min
+        </text>
+        <circle cx={x(20)} cy={y(seuil)} r="3.5" fill={palette.texte} />
+
+        {/* Les étiquettes vivent dans les bandes : pas de légende à décoder. */}
+        <text x={x(41)} y={y(volume(41) / 2) + 3} textAnchor="middle"
+          style={{ ...styleEtiquette, fill: '#FFFFFF' }}>
+          le volume
+        </text>
+        <text x={x(45)} y={y((cumuls[1](45) + cumuls[2](45)) / 2) + 3} textAnchor="middle"
+          style={{ ...styleEtiquette, fill: '#FFFFFF' }}>
+          les hormones
+        </text>
+        <text x={x(52)} y={y((cumuls[2](52) + cumuls[3](52)) / 2) + 3} textAnchor="middle"
+          style={{ ...styleEtiquette, fill: palette.texte }}>
+          l&rsquo;absorption
+        </text>
+
+        {/* Ce que mesure la hauteur, écrit une fois pour toutes. */}
+        <text x="14" y="101" textAnchor="middle" transform="rotate(-90 14 101)"
+          style={{ ...stylePetit, fontSize: 9 }}>
+          force du message d&rsquo;arrêt
+        </text>
+
+        <line x1={x(0)} x2={x(60)} y1="150" y2="150" stroke={palette.texteFaible} strokeWidth="1" />
         {[0, 15, 30, 45, 60].map((t) => (
-          <text key={t} x={x(t)} y="172" textAnchor="middle" style={stylePetit}>{t} min</text>
+          <text key={t} x={x(t)} y="164" textAnchor="middle" style={stylePetit}>
+            {t} min
+          </text>
         ))}
+        <text x={x(0)} y="180" textAnchor="start" style={{ ...stylePetit, fill: palette.texte }}>
+          première bouchée
+        </text>
       </svg>
     </Figure>
   )
