@@ -98,7 +98,7 @@ for partie, entrees in sorted(PLAN.items()):
             corps = (
                 f'> **Question** — {question}\n\n'
                 f'{resume}\n\n'
-                f'## Ce que la double page doit établir\n\n'
+                f'## Ce que la page doit établir\n\n'
                 f'{puces}\n\n'
                 f'## Reste à faire\n\n'
                 f'- Rédiger le texte\n'

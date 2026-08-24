@@ -48,9 +48,7 @@ export default async function PageDoublePage({ params }: { params: Promise<Param
 
       <article className="mt-8">
         <header className="border-b border-piste pb-8">
-          <span className="chiffre text-legende text-texte-faible">
-            Double page {dp.numero}
-          </span>
+          <span className="chiffre text-legende text-texte-faible">{dp.numero}</span>
           <h1 className="mt-2 text-titre md:text-titre-large font-titre font-semibold">
             {dp.question}
           </h1>

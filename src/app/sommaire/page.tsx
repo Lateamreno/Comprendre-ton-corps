@@ -25,8 +25,8 @@ export default function Sommaire() {
       <header className="border-b border-piste pb-8">
         <h1 className="text-titre md:text-titre-large font-titre font-semibold">Sommaire</h1>
         <p className="mt-4 text-texte-faible">
-          Neuf parties, {prevues} doubles pages. Chaque double page répond à une
-          question et se lit indépendamment des autres.
+          Neuf parties, {prevues} sujets. Chaque page répond à une question et se
+          lit indépendamment des autres.
         </p>
         <p className="chiffre mt-5 text-mention uppercase tracking-wider text-texte-faible">
           {publiees} publiée{publiees > 1 ? 's' : ''} sur {prevues}

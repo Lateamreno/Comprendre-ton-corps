@@ -47,7 +47,7 @@ export const parties: Partie[] = [
     slug: 'pourquoi-on-grossit',
     resume:
       "Le trajet d'une bouchée, l'insuline qui arbitre, les réserves qui s'ouvrent et se ferment — et le mangeur qui ne prend pas un gramme.",
-    acquis: "Comprendre par quelles routes un surplus devient du gras, ou pas.",
+    acquis: "Savoir ce que devient un surplus, selon d'où il vient et quand il arrive.",
   },
   {
     numero: 3,
@@ -56,7 +56,8 @@ export const parties: Partie[] = [
     sousTitre: "Et ce qu'on devrait éviter",
     resume:
       "Macronutriments, fibres, sucres cachés, étiquettes et allégations — et les tableaux qui comparent les aliments à portion réelle.",
-    acquis: "Lire un aliment autrement que par son nombre de calories.",
+    acquis:
+      "Choisir ses aliments et leurs proportions selon ce qu'ils apportent vraiment.",
   },
   {
     numero: 4,
