@@ -199,7 +199,7 @@ export function FicheAliment({ fiche }: { fiche: Fiche }) {
             <span style={{ ...unite, color: palette.bleu }}>kcal/g</span>
           </div>
           <div style={{ ...etiquette, textTransform: 'none', letterSpacing: 0, fontSize: 19 }}>
-            densité énergétique
+            densité calorique
           </div>
           <div style={etiquette}>Rassasiement</div>
         </div>

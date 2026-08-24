@@ -181,7 +181,7 @@ export const seuils = {
     source: 'FSA, étiquetage nutritionnel simplifié (solides)',
   },
   densiteEnergetique: {
-    grandeur: 'Densité énergétique',
+    grandeur: 'Densité calorique',
     unite: 'kcal/100 g',
     borneFavorable: 150,
     borneElevee: 400,
