@@ -1,4 +1,6 @@
 import { MDXRemote } from 'next-mdx-remote/rsc'
+import remarkGfm from 'remark-gfm'
+import { composantsFigures } from '@/components/figures'
 import {
   palette,
   polices,
@@ -63,6 +65,44 @@ const composants = {
   a: (props: React.ComponentProps<'a'>) => (
     <a {...props} style={{ color: palette.texte, textDecoration: 'underline' }} />
   ),
+  table: (props: React.ComponentProps<'table'>) => (
+    <table
+      {...props}
+      style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        margin: `0 0 ${mm(3)}`,
+        fontSize: mm(taillesImprimees.legende),
+        breakInside: 'avoid',
+      }}
+    />
+  ),
+  th: (props: React.ComponentProps<'th'>) => (
+    <th
+      {...props}
+      style={{
+        fontFamily: polices.chiffre,
+        fontWeight: 500,
+        textAlign: 'left',
+        textTransform: 'uppercase',
+        letterSpacing: '0.06em',
+        color: palette.texteFaible,
+        borderBottom: `1px solid ${palette.texte}`,
+        padding: `${mm(1)} ${mm(1.5)}`,
+      }}
+    />
+  ),
+  td: (props: React.ComponentProps<'td'>) => (
+    <td
+      {...props}
+      style={{
+        verticalAlign: 'top',
+        borderBottom: `1px solid ${palette.piste}`,
+        padding: `${mm(1)} ${mm(1.5)}`,
+      }}
+    />
+  ),
+  ...composantsFigures,
 }
 
 export function Spread({ dp }: { dp: DoublePageSituee }) {
@@ -143,7 +183,10 @@ export function Spread({ dp }: { dp: DoublePageSituee }) {
           <MDXRemote
             source={dp.corps}
             components={composants}
-            options={{ parseFrontmatter: false }}
+            options={{
+              parseFrontmatter: false,
+              mdxOptions: { remarkPlugins: [remarkGfm] },
+            }}
           />
         </div>
 

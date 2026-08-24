@@ -1,4 +1,6 @@
 import { MDXRemote } from 'next-mdx-remote/rsc'
+import remarkGfm from 'remark-gfm'
+import { composantsFigures } from '@/components/figures'
 
 /**
  * Rendu du corps d'une double page.
@@ -28,12 +30,34 @@ const composants = {
   a: (props: React.ComponentProps<'a'>) => (
     <a {...props} className="text-vert underline underline-offset-2" />
   ),
+  table: (props: React.ComponentProps<'table'>) => (
+    <div className="my-6 overflow-x-auto">
+      <table {...props} className="w-full border-collapse text-petit" />
+    </div>
+  ),
+  th: (props: React.ComponentProps<'th'>) => (
+    <th
+      {...props}
+      className="chiffre border-b border-texte px-3 py-2 text-left text-mention font-medium uppercase tracking-wider text-texte-faible"
+    />
+  ),
+  td: (props: React.ComponentProps<'td'>) => (
+    <td {...props} className="border-b border-piste px-3 py-2 align-top text-texte" />
+  ),
+  ...composantsFigures,
 }
 
 export function CorpsMdx({ source }: { source: string }) {
   return (
     <div className="text-corps">
-      <MDXRemote source={source} components={composants} options={{ parseFrontmatter: false }} />
+      <MDXRemote
+        source={source}
+        components={composants}
+        options={{
+          parseFrontmatter: false,
+          mdxOptions: { remarkPlugins: [remarkGfm] },
+        }}
+      />
     </div>
   )
 }
