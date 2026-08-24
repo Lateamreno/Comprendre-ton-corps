@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { racineCss } from '@/lib/tokens'
 import { BurgerMenu } from '@/components/BurgerMenu'
+import { Relecture } from '@/components/Relecture'
 import { navigation, nombrePubliables } from '@/lib/content'
 import { site } from '@/lib/config'
 import '@/styles/globals.css'
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <BurgerMenu parties={navigation()} total={nombrePubliables()} />
         {children}
+        <Relecture />
       </body>
     </html>
   )
