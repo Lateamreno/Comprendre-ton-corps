@@ -203,8 +203,178 @@ export function FigureGlycemie() {
   )
 }
 
+/* ------------------------------------------------------------------ */
+/* Le face-à-face des deux hormones de la faim                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Un volet occupe une page de la double page : la ghréline à gauche, la
+ * leptine à droite. `nouvellePage` pousse le second volet en tête de la
+ * colonne suivante — c'est-à-dire sur la page de droite dans le spread, et
+ * sur la page suivante dans le simulateur. En lecture continue, les deux
+ * volets s'empilent simplement.
+ *
+ * Les deux volets sont bâtis à l'identique — même schéma, même courbe, même
+ * ligne de lecture — pour que la seule différence visible soit celle qui
+ * compte : le sens dans lequel l'hormone bouge quand la faim monte.
+ */
+type NomHormone = 'ghreline' | 'leptine'
+
+/** L'organe qui produit l'hormone. Esquisse, à remplacer par le picto final. */
+function SchemaOrgane({ hormone }: { hormone: NomHormone }) {
+  const couleur = identites[hormone].couleur
+
+  return (
+    <svg viewBox="0 0 90 70" style={{ width: '3.4em', height: '2.6em', flex: 'none' }} role="img"
+      aria-label={hormone === 'ghreline' ? "L'estomac" : 'Le tissu adipeux'}>
+      {hormone === 'ghreline' ? (
+        <path
+          d="M34 8 C31 18 28 22 24 28 C16 40 20 56 36 61 C54 66 71 55 71 41 C71 28 61 22 52 20 C47 19 45 14 45 8"
+          fill={palette.piste}
+          stroke={couleur}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <g stroke={couleur} strokeWidth="2.5" fill={palette.piste}>
+          {[
+            [30, 24, 13], [55, 20, 11], [69, 38, 10],
+            [26, 45, 12], [48, 44, 13], [64, 58, 9],
+          ].map(([cx, cy, r]) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} />
+          ))}
+        </g>
+      )}
+    </svg>
+  )
+}
+
+/** L'allure de l'hormone, et le moment où la faim monte. */
+function CourbeHormone({ hormone }: { hormone: NomHormone }) {
+  const couleur = identites[hormone].couleur
+
+  // La ghréline : trois vagues dans la journée, un sommet = un appel.
+  // La leptine : un niveau lent qui suit les réserves, un creux = un appel.
+  const points: [number, number][] =
+    hormone === 'ghreline'
+      ? [[0, 0.28], [8, 0.86], [14, 0.2], [26, 0.24], [34, 0.9], [40, 0.18],
+         [54, 0.26], [62, 0.82], [70, 0.16], [82, 0.22], [100, 0.3]]
+      : [[0, 0.74], [18, 0.78], [34, 0.72], [50, 0.6], [66, 0.3],
+         [78, 0.16], [88, 0.14], [100, 0.2]]
+
+  const x = (t: number) => 8 + (t / 100) * 284
+  const y = (v: number) => 58 - v * 44
+  const d = points
+    .map(([t, v], i) => `${i === 0 ? 'M' : 'L'}${x(t).toFixed(1)} ${y(v).toFixed(1)}`)
+    .join(' ')
+
+  // Le repère : le sommet pour la ghréline, le creux pour la leptine.
+  const repere = hormone === 'ghreline' ? [34, 0.9] : [88, 0.14]
+
+  return (
+    <svg viewBox="0 0 300 78" style={{ width: '86%', height: 'auto', display: 'block' }} role="img"
+      aria-label={
+        hormone === 'ghreline'
+          ? 'La ghréline monte par vagues avant les repas'
+          : 'La leptine baisse quand les réserves baissent'
+      }>
+      <line x1="8" x2="292" y1="62" y2="62" stroke={palette.piste} strokeWidth="1" />
+      <path d={d} fill="none" stroke={couleur} strokeWidth="2.5"
+        strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={x(repere[0])} cy={y(repere[1])} r="3" fill={couleur} />
+      <text
+        x={x(repere[0]) + (hormone === 'ghreline' ? 6 : 0)}
+        y={y(repere[1]) + (hormone === 'ghreline' ? 1 : 14)}
+        textAnchor={hormone === 'ghreline' ? 'start' : 'middle'}
+        style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}
+      >
+        faim
+      </text>
+      <text x="8" y="74" style={{ ...stylePetit, fontSize: 8 }}>
+        {hormone === 'ghreline' ? 'sur une journée' : 'sur des semaines'}
+      </text>
+    </svg>
+  )
+}
+
+export function Volet({
+  hormone,
+  origine,
+  regle,
+  nouvellePage,
+  children,
+}: {
+  hormone: NomHormone
+  /** L'organe qui la produit, en deux mots. */
+  origine: string
+  /** La ligne de lecture : dans quel sens elle bouge quand la faim monte. */
+  regle: string
+  nouvellePage?: boolean
+  children: React.ReactNode
+}) {
+  const { couleur, libelle } = identites[hormone]
+
+  return (
+    <section style={{ breakBefore: nouvellePage ? 'column' : 'auto' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.6em',
+          paddingBottom: '0.4em',
+          borderBottom: `2px solid ${couleur}`,
+          breakInside: 'avoid',
+          breakAfter: 'avoid',
+        }}
+      >
+        <SchemaOrgane hormone={hormone} />
+        <div>
+          <div
+            style={{
+              fontFamily: polices.fiche,
+              fontSize: '1.05em',
+              fontWeight: 600,
+              color: couleur,
+              lineHeight: 1.1,
+            }}
+          >
+            {libelle}
+          </div>
+          <div style={{ fontFamily: polices.chiffre, fontSize: '0.7em', color: palette.texteFaible }}>
+            {origine}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ margin: '0.5em 0 0.2em', breakInside: 'avoid' }}>
+        <CourbeHormone hormone={hormone} />
+      </div>
+
+      <p
+        style={{
+          margin: '0 0 0.9em',
+          fontFamily: polices.fiche,
+          fontSize: '0.85em',
+          fontWeight: 600,
+          color: palette.texte,
+          borderTop: `1px solid ${palette.piste}`,
+          paddingTop: '0.4em',
+          breakInside: 'avoid',
+          breakAfter: 'avoid',
+        }}
+      >
+        {regle}
+      </p>
+
+      {children}
+    </section>
+  )
+}
+
 /** À enregistrer dans les rendus MDX, lecture comme spread. */
 export const composantsFigures = {
+  Volet,
   Figure,
   FigureVidange,
   FigureSignaux,

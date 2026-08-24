@@ -255,7 +255,8 @@ export function Relecture() {
     }
   }, [])
 
-  if (!monte) return null
+  // Le livre feuilletable est un lecteur plein écran : rien ne s'y superpose.
+  if (!monte || chemin.startsWith('/atelier/livre')) return null
 
   const carte =
     'rounded-[2px] border border-piste bg-fond-carte'

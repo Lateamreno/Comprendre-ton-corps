@@ -52,6 +52,14 @@ export const identites = {
   volume: { couleur: '#159949', picto: '/img/pictos/estomac.png', libelle: 'Volume' },
   satiete: { couleur: '#2E6FE0', picto: '/img/pictos/chronometre.png', libelle: 'Satiété' },
   glycemie: { couleur: '#586BDC', picto: '/img/pictos/courbe.png', libelle: 'Glycémie' },
+
+  /*
+   * Les deux hormones de la faim empruntent la couleur de l'organe qui les
+   * produit : l'estomac pour la ghréline, le tissu adipeux pour la leptine.
+   * Elles se lisent donc comme le volume et les lipides des fiches.
+   */
+  ghreline: { couleur: '#159949', picto: '/img/pictos/estomac.png', libelle: 'Ghréline' },
+  leptine: { couleur: '#FBC83B', picto: '/img/pictos/bouteille.png', libelle: 'Leptine' },
 } as const
 
 export type NomGrandeur = keyof typeof identites
@@ -300,8 +308,28 @@ export const rayon = '2px'
 /** Filets fins plutôt que cadres pleins. */
 export const filet = `1px solid ${palette.piste}`
 
+/**
+ * Format du livre, calé sur un gabarit réellement imprimable.
+ *
+ * 8,25 × 11 pouces est le plus grand format d'Amazon KDP qui accepte
+ * l'encre couleur premium. C'est la contrainte qui commande : le livre est
+ * un système de couleurs, et l'impression couleur n'est pas disponible en
+ * couverture rigide chez ce diffuseur. Valeurs en millimètres.
+ */
+export const page = { largeurMm: 209.55, hauteurMm: 279.4 } as const
+
+/** Le même format en pouces, tel qu'il est choisi côté imprimeur. */
+export const formatLivre = {
+  largeurPouces: 8.25,
+  hauteurPouces: 11,
+  libelle: '8,25 × 11 po',
+} as const
+
 /** Format réel d'une double page ouverte, en millimètres. */
-export const doublePage = { largeurMm: 400, hauteurMm: 270 } as const
+export const doublePage = {
+  largeurMm: page.largeurMm * 2,
+  hauteurMm: page.hauteurMm,
+} as const
 
 /* ------------------------------------------------------------------ */
 /* Échelle du livre imprimé                                           */
@@ -321,13 +349,19 @@ export const taillesImprimees = {
   titre: 11,
 } as const
 
-/** Marges de composition d'une double page, en millimètres. */
+/**
+ * Marges de composition d'une double page, en millimètres.
+ *
+ * La marge de fond suit la règle de reliure de l'imprimeur : au-delà de
+ * 150 pages, il faut 19 mm de blanc contre la pliure pour que le texte ne
+ * disparaisse pas dans le dos du livre.
+ */
 export const margesImprimees = {
   exterieure: 18,
   haute: 16,
   basse: 18,
   /** Blanc de part et d'autre de la pliure, pour chaque page. */
-  fond: 14,
+  fond: 19,
 } as const
 
 /**

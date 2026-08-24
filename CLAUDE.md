@@ -7,7 +7,11 @@ Site Next.js qui sert **deux usages sur une source unique** :
 1. **Outil de production du livre.** Chaque double page (DP) du livre est un fichier du repo. C'est ici que le contenu s'écrit et se relit — il n'y a pas d'autre base. Notion n'est plus utilisé pour ce projet.
 2. **Actif marketing et SEO.** Les mêmes contenus, tronqués, alimentent des pages publiques qui répondent aux questions que les gens se posent sur la nutrition et le métabolisme, et qui renvoient vers l'achat du livre.
 
-Le livre : environ 120 doubles pages — le plan dans `content/dp` fait foi, pas un nombre figé —, 200×270 mm, couverture rigide, français, marché francophone.
+Le livre : environ 120 doubles pages — le plan dans `content/dp` fait foi, pas un nombre figé —, **8,25 × 11 pouces (209,55 × 279,4 mm)**, français, marché francophone.
+
+Ce format n'est pas un choix esthétique, c'est une contrainte d'impression. Sur Amazon KDP, l'encre couleur premium n'existe qu'en broché, et 8,25 × 11 est le plus grand format qui l'accepte. **La couverture rigide y est impossible : elle est vendue en noir et blanc uniquement.** Comme le livre est bâti sur un système de couleurs (§8), la couleur l'emporte sur la reliure. Une couverture rigide supposerait un autre imprimeur, donc une autre économie — décision à prendre séparément.
+
+Les dimensions vivent dans `lib/tokens.ts` (`page`, `doublePage`, `formatLivre`) et nulle part ailleurs.
 
 Le site n'est **pas** le livre. La maquette finale part en PAO. Le site sert à écrire, à voir, et à capter de l'audience.
 
@@ -100,7 +104,10 @@ Le corps du fichier est le texte de la DP en MDX.
 Chapitres numérotés, navigation par **menu burger** (fermé par défaut, sur toutes les pages). Une DP = une page. Lecture linéaire possible (précédent / suivant) mais non imposée. Contenu tronqué selon `extrait_ratio`.
 
 ### Vue atelier — spread
-Affiche la DP dans un cadre au **ratio réel d'une double page ouverte : 400 × 270 mm**, avec la charte appliquée, pour juger la mise en page et la densité de texte. Un bouton bascule entre les deux vues.
+Affiche la DP dans un cadre au **ratio réel d'une double page ouverte**, avec la charte appliquée, pour juger la mise en page et la densité de texte. Un bouton bascule entre les deux vues.
+
+### Vue livre — feuilleter
+`/atelier/livre` empile toutes les DP publiables et les fait feuilleter au format réel. Sur écran large, la double page s'affiche ouverte ; sur téléphone en portrait, une page à la fois, avec zoom et déplacement au doigt — une page de ce format réduite à la largeur d'un téléphone est illisible sans zoom. Cette vue rend exactement la composition imprimée : elle ne se réadapte pas à l'écran, c'est son intérêt.
 
 Le contenu peut ne remplir que la moitié du cadre au début — c'est normal et attendu. Le cadre sert de jauge : il montre ce qui reste à écrire.
 

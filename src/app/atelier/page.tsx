@@ -38,6 +38,15 @@ export default function AtelierIndex() {
             </div>
           ))}
         </dl>
+
+        <p className="mt-6">
+          <Link
+            href="/atelier/livre"
+            className="chiffre inline-block border border-piste px-4 py-2 text-mention uppercase tracking-wider text-texte hover:border-vert hover:text-vert"
+          >
+            Feuilleter le livre
+          </Link>
+        </p>
       </header>
 
       {pages.length === 0 ? (

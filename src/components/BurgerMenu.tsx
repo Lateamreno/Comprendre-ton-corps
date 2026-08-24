@@ -47,10 +47,15 @@ export function BurgerMenu({
     return () => document.removeEventListener('keydown', surTouche)
   }, [ouvert])
 
+  // Le livre feuilletable a sa propre navigation, en bas de l'écran.
+  const dansLeLivre = chemin.startsWith('/atelier/livre')
+
   const basculer = (numero: number) =>
     setDeplies((liste) =>
       liste.includes(numero) ? liste.filter((n) => n !== numero) : [...liste, numero],
     )
+
+  if (dansLeLivre) return null
 
   return (
     <>
@@ -190,6 +195,11 @@ export function BurgerMenu({
           <li className="py-2">
             <Link href={auteur.chemin} className="hover:text-vert">
               Auteur
+            </Link>
+          </li>
+          <li className="py-2">
+            <Link href="/atelier/livre" className="hover:text-vert">
+              Feuilleter le livre
             </Link>
           </li>
           <li className="py-2">
