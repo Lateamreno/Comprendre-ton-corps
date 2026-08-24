@@ -93,31 +93,41 @@ export function FigureVidange() {
 }
 
 /**
- * Ce qui s'accumule pendant un repas jusqu'à ce qu'on s'arrête.
+ * Ce qui s'accumule pendant un repas, puis se défait.
  *
- * Le point de la figure : le rassasiement n'est pas un interrupteur qu'un
- * signal actionnerait. C'est une somme. Les trois apports s'empilent, la
- * courbe du dessus est leur total, et c'est ce total qui doit atteindre un
- * certain niveau pour que le repas s'arrête. Un seul des trois n'y suffit
- * jamais — et le volume, lui, se retire en route.
+ * Deux malentendus à écarter d'un coup. Le rassasiement n'est pas un
+ * interrupteur qu'un signal actionnerait : c'est une somme, et c'est elle
+ * qui doit atteindre un certain niveau. Et il n'est pas définitif : les
+ * trois apports s'éteignent l'un après l'autre, la somme repasse sous le
+ * niveau, et la faim revient. La fenêtre va donc jusqu'à trois heures, le
+ * temps que le cycle se referme.
  *
  * Les allures sont schématiques : aucune de ces contributions ne se mesure
  * en unités, la légende le dit.
  */
 export function FigureSignaux() {
-  const x = (min: number) => 42 + (min / 60) * 268
-  const y = (part: number) => 150 - part * 98
+  const x = (min: number) => 78 + (min / 180) * 234
+  const y = (part: number) => 148 - part * 104
 
   /* Le volume monte dès la première bouchée, puis reflue avec la vidange. */
   const volume = (t: number) =>
-    t <= 25 ? 0.45 * Math.min(1, t / 10) ** 0.85 : 0.45 - ((t - 25) / 35) * 0.23
+    t <= 10 ? 0.45 * (t / 10) ** 0.85
+      : t <= 25 ? 0.45
+      : 0.45 * Math.exp(-(t - 25) / 70)
 
   /* Les hormones intestinales attendent que la digestion commence. */
   const hormones = (t: number) =>
-    t <= 8 ? 0 : t >= 30 ? 0.45 : 0.45 * ((t - 8) / 22) ** 1.1
+    t <= 8 ? 0
+      : t <= 30 ? 0.45 * ((t - 8) / 22) ** 1.1
+      : t <= 90 ? 0.45
+      : 0.45 * Math.exp(-(t - 90) / 80)
 
-  /* L'absorption confirme, en dernier. */
-  const absorption = (t: number) => (t <= 25 ? 0 : 0.3 * ((t - 25) / 35) ** 1.2)
+  /* L'absorption confirme en dernier, et s'éteint en dernier. */
+  const absorption = (t: number) =>
+    t <= 25 ? 0
+      : t <= 70 ? 0.3 * ((t - 25) / 45) ** 1.2
+      : t <= 130 ? 0.3
+      : 0.3 * Math.exp(-(t - 130) / 60)
 
   const cumuls = [
     () => 0,
@@ -125,8 +135,17 @@ export function FigureSignaux() {
     (t: number) => volume(t) + hormones(t),
     (t: number) => volume(t) + hormones(t) + absorption(t),
   ]
+  const total = cumuls[3]
 
-  const instants = Array.from({ length: 49 }, (_, i) => (i * 60) / 48)
+  /* Le niveau où la somme suffit : atteint vers vingt minutes. */
+  const seuil = total(20)
+  /* Et le moment où elle repasse dessous : la faim revient. */
+  let retour = 180
+  for (let m = 30; m <= 180; m += 0.5) {
+    if (total(m) < seuil) { retour = m; break }
+  }
+
+  const instants = Array.from({ length: 91 }, (_, i) => (i * 180) / 90)
 
   const aire = (bas: (t: number) => number, haut: (t: number) => number) => {
     const dessus = instants.map((t) => `${x(t).toFixed(1)} ${y(haut(t)).toFixed(1)}`)
@@ -134,20 +153,18 @@ export function FigureSignaux() {
     return `M${dessus.join(' L')} L${dessous.join(' L')} Z`
   }
 
-  const total = cumuls[3]
-  /* Le niveau où le total suffit : atteint vers vingt minutes. */
-  const seuil = total(20)
-
   const couches = [
     { nom: 'le volume', couleur: identites.volume.couleur, bas: cumuls[0], haut: cumuls[1] },
     { nom: 'les hormones', couleur: identites.satiete.couleur, bas: cumuls[1], haut: cumuls[2] },
     { nom: "l'absorption", couleur: identites.energie.couleur, bas: cumuls[2], haut: cumuls[3] },
   ]
 
+  const graduations: [number, string][] = [[0, '0'], [30, '30 min'], [60, '1 h'], [120, '2 h'], [180, '3 h']]
+
   return (
-    <Figure legende="Ce qui s'accumule après la première bouchée : les trois apports s'empilent, la ligne du dessus est leur total. On ne s'arrête ni au premier ni au dernier, mais quand la somme atteint le niveau suffisant. Allures schématiques.">
+    <Figure legende="Ce qui s'accumule après la première bouchée : les trois apports s'empilent, la ligne noire est leur total. Le repas s'arrête quand ce total atteint le niveau du rassasiement, vers vingt minutes. Puis les trois s'éteignent l'un après l'autre : le total repasse sous le niveau, et la faim revient. Allures schématiques.">
       <svg viewBox="0 0 340 190" style={{ width: '88%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
-        aria-label="Les trois contributions au signal d'arrêt s'additionnent et atteignent le niveau suffisant vers vingt minutes">
+        aria-label="Les trois contributions au rassasiement s'additionnent, franchissent le niveau vers vingt minutes, puis s'éteignent et la faim revient">
         {couches.map((c) => (
           <path key={c.nom} d={aire(c.bas, c.haut)} fill={c.couleur} opacity="0.9" />
         ))}
@@ -161,50 +178,61 @@ export function FigureSignaux() {
           strokeLinejoin="round"
         />
 
-        {/* Le niveau suffisant, et le moment où le total l'atteint. */}
-        <line x1={x(0)} x2={x(60)} y1={y(seuil)} y2={y(seuil)} stroke={palette.texte}
+        {/* Le niveau du rassasiement, franchi dans un sens puis dans l'autre. */}
+        <line x1={x(0)} x2={x(180)} y1={y(seuil)} y2={y(seuil)} stroke={palette.texte}
           strokeWidth="1" strokeDasharray="5 4" />
-        <text x={x(1)} y={y(seuil) - 17} style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
-          assez pour
+        <text x={x(0) - 6} y={y(seuil) - 3} textAnchor="end" style={{ ...stylePetit, fontSize: 8, fill: palette.texte }}>
+          niveau du
         </text>
-        <text x={x(1)} y={y(seuil) - 7} style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
-          s&rsquo;arrêter
+        <text x={x(0) - 6} y={y(seuil) + 7} textAnchor="end" style={{ ...stylePetit, fontSize: 8, fill: palette.texte }}>
+          rassasiement
         </text>
-        <line x1={x(20)} x2={x(20)} y1="42" y2="150" stroke={palette.texte}
+
+        {/* Les deux moments qui comptent, annoncés au-dessus du dessin. */}
+        <line x1={x(20)} x2={x(20)} y1="30" y2="148" stroke={palette.texte}
           strokeWidth="1" strokeDasharray="5 4" />
-        <text x={x(20)} y="36" textAnchor="middle" style={{ ...stylePetit, fill: palette.texte }}>
-          ≈ 20 min
-        </text>
         <circle cx={x(20)} cy={y(seuil)} r="3.5" fill={palette.texte} />
+        <text x={x(20)} y="24" textAnchor="middle"
+          style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+          on s&rsquo;arrête
+        </text>
+
+        <line x1={x(retour)} x2={x(retour)} y1="30" y2="148" stroke={palette.texte}
+          strokeWidth="1" strokeDasharray="5 4" />
+        <circle cx={x(retour)} cy={y(seuil)} r="3.5" fill={palette.texte} />
+        <text x={x(retour)} y="24" textAnchor="middle"
+          style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+          la faim revient
+        </text>
 
         {/* Les étiquettes vivent dans les bandes : pas de légende à décoder. */}
-        <text x={x(41)} y={y(volume(41) / 2) + 3} textAnchor="middle"
-          style={{ ...styleEtiquette, fill: '#FFFFFF' }}>
+        <text x={x(48)} y={y(volume(48) / 2) + 3} textAnchor="middle"
+          style={{ ...styleEtiquette, fontSize: 10, fill: '#FFFFFF' }}>
           le volume
         </text>
-        <text x={x(45)} y={y((cumuls[1](45) + cumuls[2](45)) / 2) + 3} textAnchor="middle"
-          style={{ ...styleEtiquette, fill: '#FFFFFF' }}>
+        <text x={x(62)} y={y((cumuls[1](62) + cumuls[2](62)) / 2) + 3} textAnchor="middle"
+          style={{ ...styleEtiquette, fontSize: 10, fill: '#FFFFFF' }}>
           les hormones
         </text>
-        <text x={x(52)} y={y((cumuls[2](52) + cumuls[3](52)) / 2) + 3} textAnchor="middle"
-          style={{ ...styleEtiquette, fill: palette.texte }}>
+        <text x={x(88)} y={y((cumuls[2](88) + cumuls[3](88)) / 2) + 3} textAnchor="middle"
+          style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
           l&rsquo;absorption
         </text>
 
         {/* Ce que mesure la hauteur, écrit une fois pour toutes. */}
-        <text x="14" y="101" textAnchor="middle" transform="rotate(-90 14 101)"
-          style={{ ...stylePetit, fontSize: 9 }}>
+        <text x="10" y="96" textAnchor="middle" transform="rotate(-90 10 96)"
+          style={{ ...stylePetit, fontSize: 8 }}>
           force du message d&rsquo;arrêt
         </text>
 
-        <line x1={x(0)} x2={x(60)} y1="150" y2="150" stroke={palette.texteFaible} strokeWidth="1" />
-        {[0, 15, 30, 45, 60].map((t) => (
-          <text key={t} x={x(t)} y="164" textAnchor="middle" style={stylePetit}>
-            {t} min
+        <line x1={x(0)} x2={x(180)} y1="148" y2="148" stroke={palette.texteFaible} strokeWidth="1" />
+        {graduations.map(([t, libelle]) => (
+          <text key={t} x={x(t)} y="162" textAnchor="middle" style={stylePetit}>
+            {libelle}
           </text>
         ))}
-        <text x={x(0)} y="180" textAnchor="start" style={{ ...stylePetit, fill: palette.texte }}>
-          première bouchée
+        <text x={(x(0) + x(180)) / 2} y="180" textAnchor="middle" style={{ ...stylePetit, fontSize: 9 }}>
+          temps écoulé depuis la première bouchée
         </text>
       </svg>
     </Figure>
@@ -383,47 +411,67 @@ function SchemaOrgane({ hormone }: { hormone: NomHormone }) {
   )
 }
 
-/** L'allure de l'hormone, et le moment où la faim monte. */
+/**
+ * L'allure de l'hormone, et le moment où la faim monte.
+ *
+ * Les deux courbes ne se lisent pas sur le même axe, et c'est le fond du
+ * sujet : la ghréline se lit sur les heures d'une journée, la leptine sur
+ * l'état des réserves. L'une suit l'horloge, l'autre suit le gras.
+ */
 function CourbeHormone({ hormone }: { hormone: NomHormone }) {
   const couleur = identites[hormone].couleur
+  const ghreline = hormone === 'ghreline'
 
-  // La ghréline : trois vagues dans la journée, un sommet = un appel.
-  // La leptine : un niveau lent qui suit les réserves, un creux = un appel.
-  const points: [number, number][] =
-    hormone === 'ghreline'
-      ? [[0, 0.28], [8, 0.86], [14, 0.2], [26, 0.24], [34, 0.9], [40, 0.18],
-         [54, 0.26], [62, 0.82], [70, 0.16], [82, 0.22], [100, 0.3]]
-      : [[0, 0.74], [18, 0.78], [34, 0.72], [50, 0.6], [66, 0.3],
-         [78, 0.16], [88, 0.14], [100, 0.2]]
+  /*
+   * Ghréline : trois vagues avant les trois repas, sur la journée.
+   * Leptine : elle suit la masse grasse, lue de 100 % à gauche vers 0 à
+   * droite — plus les réserves fondent, plus le relevé baisse.
+   */
+  const points: [number, number][] = ghreline
+    ? [[6, 0.30], [7.4, 0.86], [8.6, 0.20], [11, 0.26], [12.2, 0.90], [13.6, 0.18],
+       [17, 0.30], [19.4, 0.84], [21, 0.16], [22, 0.22]]
+    : [[100, 0.82], [80, 0.68], [60, 0.52], [40, 0.36], [20, 0.20], [8, 0.10], [0, 0.04]]
 
-  const x = (t: number) => 8 + (t / 100) * 284
+  const x = (u: number) =>
+    ghreline ? 26 + ((u - 6) / 16) * 262 : 26 + ((100 - u) / 100) * 262
   const y = (v: number) => 58 - v * 44
-  const d = courbeLissee(points.map(([t, v]) => [x(t), y(v)] as [number, number]))
 
-  // Le repère : le sommet pour la ghréline, le creux pour la leptine.
-  const repere = hormone === 'ghreline' ? [34, 0.9] : [88, 0.14]
+  const d = courbeLissee(points.map(([u, v]) => [x(u), y(v)] as [number, number]))
+
+  /* Le repère : le sommet de midi pour la ghréline, les réserves basses pour la leptine. */
+  const repere: [number, number] = ghreline ? [12.2, 0.90] : [8, 0.10]
+
+  const graduations: [number, string][] = ghreline
+    ? [[8, '8 h'], [12, '12 h'], [16, '16 h'], [20, '20 h']]
+    : [[100, '100 %'], [50, '50 %'], [0, '0']]
 
   return (
-    <svg viewBox="0 0 300 78" style={{ width: '86%', height: 'auto', display: 'block' }} role="img"
+    <svg viewBox="0 0 300 96" style={{ width: '92%', height: 'auto', display: 'block' }} role="img"
       aria-label={
-        hormone === 'ghreline'
-          ? 'La ghréline monte par vagues avant les repas'
-          : 'La leptine baisse quand les réserves baissent'
+        ghreline
+          ? 'La ghréline monte par vagues avant chaque repas de la journée'
+          : 'La leptine baisse à mesure que les réserves de gras diminuent'
       }>
-      <line x1="8" x2="292" y1="62" y2="62" stroke={palette.piste} strokeWidth="1" />
+      <line x1="26" x2="288" y1="62" y2="62" stroke={palette.piste} strokeWidth="1" />
       <path d={d} fill="none" stroke={couleur} strokeWidth="2.5"
         strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={x(repere[0])} cy={y(repere[1])} r="3" fill={couleur} />
       <text
-        x={x(repere[0]) + (hormone === 'ghreline' ? 6 : 0)}
-        y={y(repere[1]) + (hormone === 'ghreline' ? 1 : 14)}
-        textAnchor={hormone === 'ghreline' ? 'start' : 'middle'}
+        x={x(repere[0]) + (ghreline ? 6 : 0)}
+        y={y(repere[1]) + (ghreline ? 1 : -8)}
+        textAnchor={ghreline ? 'start' : 'middle'}
         style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}
       >
         faim
       </text>
-      <text x="8" y="74" style={{ ...stylePetit, fontSize: 8 }}>
-        {hormone === 'ghreline' ? 'sur une journée' : 'sur des semaines'}
+
+      {graduations.map(([u, libelle]) => (
+        <text key={u} x={x(u)} y="74" textAnchor="middle" style={{ ...stylePetit, fontSize: 8 }}>
+          {libelle}
+        </text>
+      ))}
+      <text x="157" y="90" textAnchor="middle" style={{ ...stylePetit, fontSize: 8 }}>
+        {ghreline ? 'heures de la journée' : 'réserves de gras'}
       </text>
     </svg>
   )
