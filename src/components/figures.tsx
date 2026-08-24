@@ -59,7 +59,7 @@ export function FigureVidange() {
   const x = (t: number) => 42 + (t / 4) * 278
   const y = (pct: number) => 172 - (pct / 100) * 150
   const trace = (points: [number, number][]) =>
-    points.map(([t, p], i) => `${i === 0 ? 'M' : 'L'}${x(t).toFixed(1)} ${y(p).toFixed(1)}`).join(' ')
+    courbeLissee(points.map(([t, p]) => [x(t), y(p)] as [number, number]))
 
   const solide: [number, number][] = [[0, 100], [0.5, 95], [1, 80], [1.5, 62], [2, 45], [3, 22], [4, 8]]
   const liquide: [number, number][] = [[0, 100], [0.5, 55], [1, 30], [1.5, 17], [2, 9], [3, 3], [4, 1]]
@@ -238,12 +238,42 @@ export function FigureVitesse() {
   )
 }
 
-/** La glycémie après un repas vite absorbé et après un repas amorti. */
+/**
+ * Passe une courbe lisse par des points, sans les trahir.
+ *
+ * Une ligne brisée donne des angles là où le corps n'en fait pas. La spline
+ * de Catmull-Rom, convertie en Bézier, passe exactement par chaque point
+ * mesuré tout en arrondissant le trajet entre deux.
+ */
+function courbeLissee(points: [number, number][]): string {
+  const p = points
+  if (p.length < 3) return `M${p.map(([a, b]) => `${a} ${b}`).join(' L')}`
+
+  let d = `M${p[0][0].toFixed(1)} ${p[0][1].toFixed(1)}`
+  for (let i = 0; i < p.length - 1; i++) {
+    const avant = p[i - 1] ?? p[i]
+    const de = p[i]
+    const vers = p[i + 1]
+    const apres = p[i + 2] ?? vers
+    const c1 = [de[0] + (vers[0] - avant[0]) / 6, de[1] + (vers[1] - avant[1]) / 6]
+    const c2 = [vers[0] - (apres[0] - de[0]) / 6, vers[1] - (apres[1] - de[1]) / 6]
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)}, ${c2[0].toFixed(1)} ${c2[1].toFixed(1)}, ${vers[0].toFixed(1)} ${vers[1].toFixed(1)}`
+  }
+  return d
+}
+
+/**
+ * La glycémie après un repas vite absorbé et après un repas amorti.
+ *
+ * Les deux courbes décrivent la même grandeur : les distinguer relève donc
+ * du registre de valeur, pas de celui de l'identité — l'une porte un
+ * verdict à surveiller, l'autre un verdict favorable. La couleur ne suffit
+ * pas (rouge et vert sont précisément la paire que le daltonisme confond) :
+ * chaque courbe porte son nom, et l'amortie est tiretée.
+ */
 export function FigureGlycemie() {
-  const x = (min: number) => 42 + (min / 180) * 278
-  const y = (v: number) => 96 - v * 52
-  const trace = (points: [number, number][]) =>
-    points.map(([t, v], i) => `${i === 0 ? 'M' : 'L'}${x(t).toFixed(1)} ${y(v).toFixed(1)}`).join(' ')
+  const x = (min: number) => 64 + (min / 180) * 250
+  const y = (v: number) => 88 - v * 52
 
   const rapide: [number, number][] = [
     [0, 0], [15, 0.55], [35, 1], [55, 0.72], [80, 0.15], [105, -0.4], [125, -0.52], [150, -0.28], [180, -0.05],
@@ -252,27 +282,52 @@ export function FigureGlycemie() {
     [0, 0], [20, 0.25], [45, 0.42], [75, 0.38], [110, 0.22], [145, 0.08], [180, 0],
   ]
 
+  const enPoints = (pts: [number, number][]) =>
+    pts.map(([t, v]) => [x(t), y(v)] as [number, number])
+
+  const traceRapide = courbeLissee(enPoints(rapide))
+  /* Le creux, teinté : c'est lui le sujet de la page. */
+  const aireRapide = `${traceRapide} L${x(180).toFixed(1)} ${y(0).toFixed(1)} L${x(0).toFixed(1)} ${y(0).toFixed(1)} Z`
+
   return (
-    <Figure legende="Allure de la glycémie après deux repas. Le repas vite absorbé monte haut puis passe sous le niveau de départ : c'est ce creux qui appelle la fringale. Le repas amorti — fibres, protéines, aliments entiers — dessine une vague sans creux.">
-      <svg viewBox="0 0 340 170" style={{ width: '88%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
-        aria-label="Glycémie comparée après un repas vite absorbé et un repas amorti">
-        <line x1="42" x2="320" y1={y(0)} y2={y(0)} stroke={palette.piste} strokeWidth="1" />
-        <text x="36" y={y(0) + 3} textAnchor="end" style={stylePetit}>départ</text>
-        <path d={trace(rapide)} fill="none" stroke={identites.glycemie.couleur} strokeWidth="2.5"
-          strokeLinecap="round" strokeLinejoin="round" />
-        <path d={trace(amortie)} fill="none" stroke={palette.violetClair} strokeWidth="2.5"
-          strokeDasharray="6 5" strokeLinecap="round" strokeLinejoin="round" />
-        <text x={x(30)} y={y(1.02) - 6} style={{ ...styleEtiquette, fill: identites.glycemie.couleur }}>
+    <Figure legende="Allure de la glycémie après deux repas, à partir du même niveau de départ. Le repas vite absorbé monte haut, puis repasse sous ce niveau : la zone teintée est le creux, et c'est lui qui appelle la fringale. Le repas amorti — fibres, protéines, aliments entiers — dessine une vague qui ne descend jamais sous la ligne.">
+      <svg viewBox="0 0 340 176" style={{ width: '88%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Glycémie comparée après un repas vite absorbé et un repas amorti, de part et d'autre du niveau de départ">
+        <defs>
+          <clipPath id="glycemie-sous-depart">
+            <rect x={x(0)} y={y(0)} width={x(180) - x(0)} height="60" />
+          </clipPath>
+        </defs>
+
+        <path d={aireRapide} fill={palette.rouge} opacity="0.16"
+          clipPath="url(#glycemie-sous-depart)" />
+
+        {/* La référence : sans elle, « passer en dessous » ne se voit pas. */}
+        <line x1={x(0)} x2={x(180)} y1={y(0)} y2={y(0)} stroke={palette.texteFaible} strokeWidth="1.2" />
+        <text x={x(0) - 6} y={y(0) - 3} textAnchor="end" style={{ ...stylePetit, fontSize: 9 }}>
+          niveau
+        </text>
+        <text x={x(0) - 6} y={y(0) + 7} textAnchor="end" style={{ ...stylePetit, fontSize: 9 }}>
+          de départ
+        </text>
+
+        <path d={courbeLissee(enPoints(amortie))} fill="none" stroke={palette.vert} strokeWidth="2.5"
+          strokeDasharray="7 5" strokeLinecap="round" />
+        <path d={traceRapide} fill="none" stroke={palette.rouge} strokeWidth="2.5" strokeLinecap="round" />
+
+        <text x={x(35)} y={y(1) - 8} textAnchor="middle" style={{ ...styleEtiquette, fill: palette.rouge }}>
           repas vite absorbé
         </text>
-        <text x={x(88)} y={y(0.46) - 6} style={{ ...styleEtiquette, fill: palette.violetClair }}>
+        <text x={x(112)} y={y(0.22) - 8} style={{ ...styleEtiquette, fill: palette.vert }}>
           repas amorti
         </text>
-        <text x={x(125)} y={y(-0.52) + 16} textAnchor="middle" style={{ ...stylePetit, fill: identites.glycemie.couleur }}>
+        <text x={x(125)} y={y(-0.52) + 15} textAnchor="middle"
+          style={{ ...stylePetit, fill: palette.rouge }}>
           le creux
         </text>
+
         {[0, 60, 120, 180].map((t) => (
-          <text key={t} x={x(t)} y="162" textAnchor="middle" style={stylePetit}>
+          <text key={t} x={x(t)} y="168" textAnchor="middle" style={stylePetit}>
             {t === 0 ? '0' : t === 60 ? '1 h' : t === 120 ? '2 h' : '3 h'}
           </text>
         ))}
@@ -343,9 +398,7 @@ function CourbeHormone({ hormone }: { hormone: NomHormone }) {
 
   const x = (t: number) => 8 + (t / 100) * 284
   const y = (v: number) => 58 - v * 44
-  const d = points
-    .map(([t, v], i) => `${i === 0 ? 'M' : 'L'}${x(t).toFixed(1)} ${y(v).toFixed(1)}`)
-    .join(' ')
+  const d = courbeLissee(points.map(([t, v]) => [x(t), y(v)] as [number, number]))
 
   // Le repère : le sommet pour la ghréline, le creux pour la leptine.
   const repere = hormone === 'ghreline' ? [34, 0.9] : [88, 0.14]
