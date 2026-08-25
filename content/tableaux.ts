@@ -110,6 +110,81 @@ export const tableaux = {
       { code: '15202', nom: 'Beurre de cacahuète', portion: 20, mesure: 'une cuillère' },
     ],
   },
+  platsComplets: {
+    titre: 'Plats complets',
+    lignes: [
+      { code: '25033', nom: 'Bœuf bourguignon', portion: 350, mesure: 'une assiette' },
+      { code: '25001', nom: 'Blanquette de veau', portion: 350, mesure: 'une assiette' },
+      { code: '25111', nom: 'Chili con carne', portion: 350, mesure: 'une assiette' },
+      { code: '25138', nom: 'Couscous au poulet', portion: 350, mesure: 'une assiette' },
+      { code: '25081', nom: 'Lasagnes à la viande', portion: 350, mesure: 'une part' },
+      { code: '25009', nom: 'Hachis parmentier', portion: 350, mesure: 'une part' },
+      { code: '25242', nom: 'Paella', portion: 350, mesure: 'une assiette' },
+      { code: '25056', nom: 'Gratin dauphinois', portion: 250, mesure: 'une part' },
+      { code: '25608', nom: 'Taboulé', portion: 250, mesure: 'une part' },
+    ],
+  },
+  platsPrepares: {
+    titre: 'Plats préparés et repas pris dehors',
+    lignes: [
+      { code: '25404', nom: 'Pizza margherita', portion: 350, mesure: 'une pizza' },
+      { code: '25405', nom: 'Quiche lorraine', portion: 150, mesure: 'une part' },
+      { code: '25413', nom: 'Hamburger', portion: 110, mesure: 'un burger' },
+      { code: '25429', nom: 'Kebab en baguette', portion: 300, mesure: 'un sandwich' },
+      { code: '25431', nom: 'Sandwich thon mayonnaise', portion: 250, mesure: 'un sandwich' },
+      { code: '25089', nom: 'Cordon bleu', portion: 100, mesure: 'une pièce' },
+      { code: '4032', nom: 'Frites', portion: 150, mesure: 'une portion' },
+      { code: '25666', nom: 'Salade composée en barquette', portion: 250, mesure: 'une barquette' },
+    ],
+  },
+  encasSales: {
+    titre: 'En-cas salés',
+    lignes: [
+      { code: '4004', nom: 'Chips', portion: 30, mesure: 'une poignée' },
+      { code: '15002', nom: 'Cacahuètes salées', portion: 30, mesure: 'une poignée' },
+      { code: '9230', nom: 'Pop-corn salé', portion: 30, mesure: 'un bol' },
+      { code: '38107', nom: 'Bretzels apéritif', portion: 30, mesure: 'une poignée' },
+      { code: '15000', nom: 'Amandes', portion: 30, mesure: 'une poignée' },
+      { code: '22010', nom: 'Œuf dur', portion: 50, mesure: 'un œuf' },
+      { code: '28902', nom: 'Jambon cuit', portion: 50, mesure: 'une tranche' },
+    ],
+  },
+  encasSucres: {
+    titre: 'En-cas sucrés',
+    lignes: [
+      { code: '31004', nom: 'Chocolat au lait', portion: 25, mesure: 'cinq carrés' },
+      { code: '31000', nom: 'Barre chocolatée', portion: 45, mesure: 'une barre' },
+      { code: '31101', nom: 'Barre de céréales', portion: 25, mesure: 'une barre' },
+      { code: '7615', nom: 'Croissant', portion: 60, mesure: 'une pièce' },
+      { code: '7730', nom: 'Pain au chocolat', portion: 70, mesure: 'une pièce' },
+      { code: '24684', nom: 'Cookie au chocolat', portion: 40, mesure: 'un cookie' },
+      { code: '13038', nom: 'Compote de pomme', portion: 100, mesure: 'une gourde' },
+      { code: '13039', nom: 'Pomme', portion: 150, mesure: 'une moyenne' },
+      { code: '19593', nom: 'Yaourt nature', portion: 125, mesure: 'un pot' },
+    ],
+  },
+  encasDenses: {
+    titre: 'Les plus concentrés',
+    lignes: [
+      { code: '17270', nom: "Huile d'olive", portion: 10, mesure: 'une cuillère' },
+      { code: '15005', nom: 'Noix', portion: 30, mesure: 'une poignée' },
+      { code: '4004', nom: 'Chips', portion: 30, mesure: 'une poignée' },
+      { code: '31004', nom: 'Chocolat au lait', portion: 25, mesure: 'cinq carrés' },
+      { code: '13046', nom: 'Raisins secs', portion: 40, mesure: 'une poignée' },
+      { code: '7615', nom: 'Croissant', portion: 60, mesure: 'une pièce' },
+    ],
+  },
+  encasVolumineux: {
+    titre: 'Les plus volumineux',
+    lignes: [
+      { code: '9230', nom: 'Pop-corn salé', portion: 30, mesure: 'un bol' },
+      { code: '19644', nom: 'Fromage blanc 0 %', portion: 200, mesure: 'un grand pot' },
+      { code: '22010', nom: 'Œuf dur', portion: 50, mesure: 'un œuf' },
+      { code: '13014', nom: 'Fraises', portion: 200, mesure: 'une coupelle' },
+      { code: '13039', nom: 'Pomme', portion: 150, mesure: 'une moyenne' },
+      { code: '20009', nom: 'Carottes crues', portion: 150, mesure: 'quelques bâtonnets' },
+    ],
+  },
 } as const satisfies Record<string, JeuTableau>
 
 export type CleTableau = keyof typeof tableaux

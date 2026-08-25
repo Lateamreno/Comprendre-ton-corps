@@ -33,10 +33,13 @@ function pourCentKcal(kcal: Mesure): string {
 export function TableAliments({
   jeu,
   nouvellePage = false,
+  sel = false,
 }: {
   /** Clé du jeu de lignes dans content/tableaux.ts. */
   jeu: CleTableau
   nouvellePage?: boolean
+  /** Ajoute la colonne du sel, quand c'est elle qui porte le propos. */
+  sel?: boolean
 }) {
   const { titre, lignes }: { titre: string; lignes: readonly LigneAliment[] } =
     tableaux[jeu]
@@ -86,6 +89,7 @@ export function TableAliments({
             <th style={entete}>Gluc.</th>
             <th style={entete}>Lip.</th>
             <th style={entete}>Fibres</th>
+            {sel && <th style={entete}>Sel</th>}
             <th style={entete}>Pour 100 kcal</th>
           </tr>
         </thead>
@@ -104,6 +108,9 @@ export function TableAliments({
                 <td style={cellule}>{arrondi(pourPortion(a.glucides, l.portion))}</td>
                 <td style={cellule}>{arrondi(pourPortion(a.lipides, l.portion))}</td>
                 <td style={cellule}>{arrondi(pourPortion(a.fibres, l.portion))}</td>
+                {sel && (
+                  <td style={cellule}>{arrondi(pourPortion(a.sel, l.portion), 1)}</td>
+                )}
                 <td style={cellule}>{pourCentKcal(a.kcal)}</td>
               </tr>
             )
@@ -119,8 +126,8 @@ export function TableAliments({
           margin: '0.4em 0 0',
         }}
       >
-        Protéines, glucides, lipides et fibres en grammes pour la portion
-        indiquée. La dernière colonne donne le poids d’aliment qui apporte
+        Protéines, glucides, lipides, fibres{sel ? ' et sel' : ''} en grammes
+        pour la portion indiquée. La dernière colonne donne le poids d’aliment qui apporte
         cent kilocalories : plus il est élevé, plus l’aliment occupe de place
         pour la même énergie. Source : Ciqual 2025.
       </p>
