@@ -1,6 +1,7 @@
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
 import { composantsFigures } from '@/components/figures'
+import { composantsTables } from '@/components/tables'
 
 /**
  * Rendu du corps d'une double page.
@@ -45,6 +46,7 @@ const composants = {
     <td {...props} className="border-b border-piste px-3 py-2 align-top text-texte" />
   ),
   ...composantsFigures,
+  ...composantsTables,
 }
 
 export function CorpsMdx({ source }: { source: string }) {

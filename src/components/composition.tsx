@@ -1,5 +1,6 @@
 import { palette, polices, taillesImprimees } from '@/lib/tokens'
 import { composantsFigures } from '@/components/figures'
+import { composantsTables } from '@/components/tables'
 
 /**
  * L'habillage du texte à l'échelle imprimée.
@@ -89,5 +90,6 @@ export function composantsImprimes(mm: (valeur: number) => string) {
       />
     ),
     ...composantsFigures,
+    ...composantsTables,
   }
 }
