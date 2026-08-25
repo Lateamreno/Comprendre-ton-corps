@@ -1,4 +1,4 @@
-import { identites, palette, polices } from '@/lib/tokens'
+import { couleurPourSeuil, identites, palette, polices } from '@/lib/tokens'
 
 /**
  * Les figures des doubles pages.
@@ -474,6 +474,61 @@ export function FigureReserves() {
   )
 }
 
+/**
+ * Ce que pèsent 200 kcal, selon l'aliment.
+ *
+ * Les barres sont à la même échelle et valent toutes la même énergie :
+ * seule leur longueur, c'est-à-dire le poids qu'il faut manger, change. La
+ * couleur vient des seuils de densité calorique de lib/tokens.ts, comme
+ * sur les fiches — elle situe la densité, pas la qualité nutritionnelle,
+ * et la légende le dit.
+ */
+export function FigureDeuxCents() {
+  /* Poids nécessaires pour 200 kcal, calculés depuis Ciqual 2025. */
+  const aliments = [
+    { nom: 'Concombre', kcal100: 16.8, grammes: 1190 },
+    { nom: 'Pomme', kcal100: 54, grammes: 370 },
+    { nom: 'Riz cuit', kcal100: 155, grammes: 129 },
+    { nom: 'Chips', kcal100: 532, grammes: 38 },
+    { nom: "Huile d'olive", kcal100: 899, grammes: 22 },
+  ]
+
+  const gauche = 76
+  const large = 196
+  const max = aliments[0].grammes
+  const y = (i: number) => 22 + i * 24
+
+  return (
+    <Figure legende="Le poids qu'il faut manger pour obtenir 200 kcal, aliment par aliment. Les cinq barres valent la même énergie ; seul le poids change, dans un rapport de plus de cinquante. La couleur situe la densité calorique selon les seuils du livre : elle ne dit rien de la qualité nutritionnelle d'un aliment. Source : Ciqual 2025.">
+      <svg viewBox="0 0 340 140" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Poids nécessaire pour 200 kcal, du concombre à l'huile d'olive">
+        <text x="8" y="12" style={{ ...stylePetit, fontSize: 9 }}>
+          200 kcal, c&rsquo;est ce poids d&rsquo;aliment :
+        </text>
+        {aliments.map((a, i) => {
+          const couleur = couleurPourSeuil('densiteEnergetique', a.kcal100)
+          const l = Math.max((a.grammes / max) * large, 3)
+          return (
+            <g key={a.nom}>
+              <text x={gauche - 6} y={y(i) + 11} textAnchor="end"
+                style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+                {a.nom}
+              </text>
+              <rect x={gauche} y={y(i)} width={l} height="14" rx="1" fill={couleur} />
+              <text x={gauche + l + 6} y={y(i) + 11}
+                style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+                {a.grammes >= 1000
+                  ? `${(a.grammes / 1000).toFixed(2).replace('.', ',')} kg`
+                  : `${a.grammes} g`}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </Figure>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /* Le face-à-face des deux hormones de la faim                        */
 /* ------------------------------------------------------------------ */
@@ -707,6 +762,7 @@ export const composantsFigures = {
   FigureVidange,
   FigureTrajet,
   FigureReserves,
+  FigureDeuxCents,
   FigureSignaux,
   FigureVitesse,
   FigureGlycemie,
