@@ -806,6 +806,205 @@ export function DeuxSens({ perdre, prendre }: { perdre: string; prendre: string 
 }
 
 /** À enregistrer dans les rendus MDX, lecture comme spread. */
+/**
+ * La part d'eau des aliments, mise en regard de leur énergie.
+ *
+ * L'eau ne porte aucune calorie mais occupe le volume : c'est la même
+ * grandeur que la densité calorique, lue par l'autre bout. La barre porte
+ * la part d'eau, le nombre à droite l'énergie, et les deux vont en sens
+ * inverse sans qu'aucune couleur n'ait à le dire.
+ */
+export function FigureEau() {
+  /* Ciqual 2025, pour 100 g d'aliment. */
+  const aliments = [
+    { nom: 'Laitue', eau: 95.4, kcal: 15 },
+    { nom: 'Pomme', eau: 85.4, kcal: 54 },
+    { nom: 'Pomme de terre', eau: 78.3, kcal: 81 },
+    { nom: 'Riz cuit', eau: 61.4, kcal: 155 },
+    { nom: 'Emmental', eau: 39.1, kcal: 373 },
+    { nom: 'Chips', eau: 1.4, kcal: 532 },
+    { nom: "Huile d'olive", eau: 0.1, kcal: 899 },
+  ]
+
+  const gauche = 100
+  const large = 138
+  const y = (i: number) => 24 + i * 19
+
+  return (
+    <Figure legende="Pour cent grammes d'aliment : la part qui est de l'eau, et l'énergie que les cent grammes apportent. Les deux colonnes descendent et montent ensemble, en sens inverse. L'eau est ce qui occupe la place sans rien apporter. Source : Ciqual 2025.">
+      <svg viewBox="0 0 340 168" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Part d'eau et énergie de sept aliments courants, pour 100 g">
+        <text x={gauche} y="14" style={{ ...stylePetit, fontSize: 9 }}>part d&rsquo;eau</text>
+        <text x={gauche + large + 32} y="14" style={{ ...stylePetit, fontSize: 9 }}>
+          énergie
+        </text>
+        {aliments.map((a, i) => {
+          const l = Math.max((a.eau / 100) * large, 1)
+          return (
+            <g key={a.nom}>
+              <text x={gauche - 6} y={y(i) + 10} textAnchor="end"
+                style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+                {a.nom}
+              </text>
+              <rect x={gauche} y={y(i)} width={large} height="12" rx="1" fill={palette.piste} />
+              <rect x={gauche} y={y(i)} width={l} height="12" rx="1" fill={palette.bleu} />
+              <text x={gauche + l + 5} y={y(i) + 10}
+                style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+                {`${a.eau.toFixed(0)} %`}
+              </text>
+              <text x={gauche + large + 74} y={y(i) + 10} textAnchor="end"
+                style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+                {`${a.kcal} kcal`}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </Figure>
+  )
+}
+
+/**
+ * L'indice glycémique face à la charge glycémique.
+ *
+ * Les deux grandeurs ne répondent pas à la même question : l'indice décrit
+ * la vitesse d'un glucide, la charge ce qu'une portion réelle envoie
+ * vraiment. Les mettre côte à côte est le seul moyen de montrer que la
+ * pastèque et le pain blanc, voisins sur l'indice, n'ont rien à voir sur
+ * la charge. Les deux échelles diffèrent : chacune porte la sienne.
+ */
+export function FigureIndiceCharge() {
+  /* Atkinson et al. 2021 pour l'indice, tables 2008 pour la charge. */
+  const aliments = [
+    { nom: 'Pain blanc', portion: '30 g', ig: 75, cg: 11 },
+    { nom: 'Pomme de terre', portion: '150 g', ig: 78, cg: 16 },
+    { nom: 'Pastèque', portion: '120 g', ig: 76, cg: 4 },
+    { nom: 'Riz blanc', portion: '150 g', ig: 73, cg: 29 },
+    { nom: 'Pomme', portion: '120 g', ig: 36, cg: 5 },
+    { nom: 'Lentilles', portion: '150 g', ig: 32, cg: 5 },
+  ]
+
+  const gauche = 100
+  const largeIg = 74
+  const debutCg = 204
+  const largeCg = 76
+  const maxCg = 30
+  const y = (i: number) => 28 + i * 20
+
+  return (
+    <Figure legende="À gauche, l'indice glycémique : la vitesse à laquelle le glucide de l'aliment arrive dans le sang, sur une échelle de 0 à 100. À droite, la charge glycémique d'une portion courante : ce que cette portion envoie réellement. La pastèque et le pain blanc ont presque le même indice ; leurs portions n'envoient pas la même chose. Sources : tables internationales, 2008 et 2021.">
+      <svg viewBox="0 0 340 162" style={{ width: '96%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Indice glycémique et charge glycémique de six aliments">
+        <text x={gauche} y="13" style={{ ...stylePetit, fontSize: 9 }}>indice — vitesse</text>
+        <text x={debutCg} y="13" style={{ ...stylePetit, fontSize: 9 }}>charge — portion</text>
+        <text x={gauche} y="24" style={{ ...stylePetit, fontSize: 8 }}>0 à 100</text>
+        <text x={debutCg} y="24" style={{ ...stylePetit, fontSize: 8 }}>0 à 30</text>
+        {aliments.map((a, i) => {
+          const li = (a.ig / 100) * largeIg
+          const lc = (a.cg / maxCg) * largeCg
+          return (
+            <g key={a.nom}>
+              <text x={gauche - 6} y={y(i) + 10} textAnchor="end"
+                style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+                {a.nom}
+              </text>
+              <text x={gauche - 6} y={y(i) + 19} textAnchor="end"
+                style={{ ...stylePetit, fontSize: 7.5 }}>
+                {a.portion}
+              </text>
+              <rect x={gauche} y={y(i)} width={largeIg} height="12" rx="1" fill={palette.piste} />
+              <rect x={gauche} y={y(i)} width={li} height="12" rx="1" fill={identites.glycemie.couleur} />
+              <text x={gauche + largeIg + 5} y={y(i) + 10}
+                style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+                {a.ig}
+              </text>
+              <rect x={debutCg} y={y(i)} width={largeCg} height="12" rx="1" fill={palette.piste} />
+              <rect x={debutCg} y={y(i)} width={lc} height="12" rx="1" fill={palette.violetClair} />
+              <text x={debutCg + largeCg + 5} y={y(i) + 10}
+                style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+                {a.cg}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </Figure>
+  )
+}
+
+/**
+ * Les sucres pour cent grammes, rangés en deux groupes.
+ *
+ * Le point de la page n'est pas qu'un cola est sucré — tout le monde le
+ * sait — mais que des produits qu'on ne range pas dans les sucreries en
+ * contiennent autant. Les deux groupes sont donc dessinés sur la même
+ * échelle, et le morceau de sucre sert d'unité familière.
+ */
+export function FigureSucre() {
+  /* Ciqual 2025, sucres totaux pour 100 g (100 ml pour le cola). */
+  const attendus = [
+    { nom: 'Cola', valeur: 10 },
+    { nom: 'Compote de pomme', valeur: 22.6 },
+    { nom: 'Biscuit au chocolat', valeur: 35.4 },
+  ]
+  const inattendus = [
+    { nom: 'Yaourt aromatisé', valeur: 12.5 },
+    { nom: 'Ketchup', valeur: 21.1 },
+    { nom: 'Muesli croustillant', valeur: 21.5 },
+    { nom: 'Sauce barbecue', valeur: 27.5 },
+    { nom: 'Barre « équilibre »', valeur: 30.4 },
+  ]
+
+  const gauche = 116
+  const large = 122
+  const max = 36
+  const ligne = (i: number) => 30 + i * 17
+
+  const rang = (
+    a: { nom: string; valeur: number },
+    i: number,
+  ) => {
+    const l = Math.max((a.valeur / max) * large, 2)
+    const morceaux = Math.round(a.valeur / 6)
+    return (
+      <g key={a.nom}>
+        <text x={gauche - 6} y={ligne(i) + 9} textAnchor="end"
+          style={{ ...styleEtiquette, fontSize: 9.5, fill: palette.texte }}>
+          {a.nom}
+        </text>
+        <rect x={gauche} y={ligne(i)} width={large} height="11" rx="1" fill={palette.piste} />
+        <rect x={gauche} y={ligne(i)} width={l} height="11" rx="1"
+          fill={couleurPourSeuil('sucres', a.valeur)} />
+        <text x={gauche + large + 6} y={ligne(i) + 9}
+          style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+          {`${a.valeur.toFixed(1).replace('.', ',')} g`}
+        </text>
+        <text x={gauche + large + 44} y={ligne(i) + 9}
+          style={{ ...stylePetit, fontSize: 8 }}>
+          {`${morceaux} morceaux`}
+        </text>
+      </g>
+    )
+  }
+
+  return (
+    <Figure legende="Sucres totaux pour cent grammes de produit, cent millilitres pour le cola, convertis en morceaux de sucre de six grammes. En haut, les produits qu'on range spontanément dans les sucreries ; en bas, ceux qu'on n'y range pas. La couleur suit les seuils de l'étiquetage simplifié. Source : Ciqual 2025.">
+      <svg viewBox="0 0 340 200" style={{ width: '97%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Teneur en sucres de huit produits, en grammes et en morceaux de sucre">
+        <text x="8" y="14" style={{ ...styleEtiquette, fontSize: 9, fill: palette.texte }}>
+          Ce qu&rsquo;on appelle sucré
+        </text>
+        {attendus.map((a, i) => rang(a, i))}
+        <line x1="8" y1={ligne(3) + 2} x2="332" y2={ligne(3) + 2} stroke={palette.piste} strokeWidth="1" />
+        <text x="8" y={ligne(3) + 16} style={{ ...styleEtiquette, fontSize: 9, fill: palette.texte }}>
+          Ce qu&rsquo;on n&rsquo;appelle pas sucré
+        </text>
+        {inattendus.map((a, i) => rang(a, i + 4.6))}
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -818,4 +1017,7 @@ export const composantsFigures = {
   FigureSignaux,
   FigureVitesse,
   FigureGlycemie,
+  FigureEau,
+  FigureIndiceCharge,
+  FigureSucre,
 }
