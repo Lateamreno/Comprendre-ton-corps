@@ -364,6 +364,70 @@ export function FigureGlycemie() {
   )
 }
 
+/**
+ * Le trajet d'une bouchée, et l'endroit où le corps prélève.
+ *
+ * La largeur des segments n'est pas à l'échelle du temps : une bouche qui
+ * mâche trente secondes disparaîtrait à côté d'un côlon qui travaille deux
+ * jours. Les durées sont donc écrites, pas dessinées. Ce que la figure
+ * montre à l'échelle, c'est la place de l'absorption : presque tout se joue
+ * dans un seul des quatre segments.
+ */
+export function FigureTrajet() {
+  const etapes = [
+    { nom: 'La bouche', duree: '10 à 30 s', part: 0.18, absorbe: 'rien' },
+    { nom: "L'estomac", duree: '2 à 4 h', part: 0.23, absorbe: 'presque rien' },
+    { nom: "L'intestin grêle", duree: '3 à 5 h', part: 0.32, absorbe: 'presque tout', cle: true },
+    { nom: 'Le côlon', duree: '12 à 48 h', part: 0.27, absorbe: "l'eau, et ce que" },
+  ]
+
+  const gauche = 8
+  const large = 324
+  let curseur = gauche
+
+  return (
+    <Figure legende="Le trajet d'une bouchée, du premier coup de dent au bout de l'intestin. Les largeurs ne sont pas à l'échelle du temps : les durées sont écrites. Ce qui compte est ailleurs : rien ne passe dans le sang avant l'intestin grêle, et presque tout y passe.">
+      <svg viewBox="0 0 340 126" style={{ width: '96%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Les quatre étapes du trajet d'un aliment et ce qui est absorbé à chacune">
+        {etapes.map((e) => {
+          const l = large * e.part
+          const x = curseur
+          curseur += l
+          const accent = e.cle ? palette.vert : palette.texteFaible
+          return (
+            <g key={e.nom}>
+              <rect x={x + 1} y="34" width={l - 2} height="30" rx="2"
+                fill={e.cle ? palette.vert : palette.piste} opacity={e.cle ? 0.16 : 1} />
+              <rect x={x + 1} y="34" width={l - 2} height="30" rx="2"
+                fill="none" stroke={accent} strokeWidth={e.cle ? 1.6 : 1} />
+              <text x={x + l / 2} y="26" textAnchor="middle"
+                style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+                {e.nom}
+              </text>
+              <text x={x + l / 2} y="53" textAnchor="middle" style={{ ...stylePetit, fontSize: 8.5, fill: palette.texte }}>
+                {e.duree}
+              </text>
+              <text x={x + l / 2} y="82" textAnchor="middle"
+                style={{ ...styleEtiquette, fontSize: 9, fill: accent }}>
+                {e.absorbe}
+              </text>
+              {e.nom === 'Le côlon' && (
+                <text x={x + l / 2} y="92" textAnchor="middle" style={{ ...styleEtiquette, fontSize: 9, fill: accent }}>
+                  font les bactéries
+                </text>
+              )}
+            </g>
+          )
+        })}
+
+        <text x="170" y="118" textAnchor="middle" style={{ ...stylePetit, fontSize: 9 }}>
+          ce qui passe dans le sang, étape par étape
+        </text>
+      </svg>
+    </Figure>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /* Le face-à-face des deux hormones de la faim                        */
 /* ------------------------------------------------------------------ */
@@ -556,6 +620,7 @@ export const composantsFigures = {
   Volet,
   Figure,
   FigureVidange,
+  FigureTrajet,
   FigureSignaux,
   FigureVitesse,
   FigureGlycemie,
