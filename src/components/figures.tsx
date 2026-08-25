@@ -529,6 +529,57 @@ export function FigureDeuxCents() {
   )
 }
 
+/**
+ * Les trois macronutriments comparés sur ce qui les distingue vraiment.
+ *
+ * L'énergie par gramme est la donnée que tout le monde connaît ; le coût
+ * digestif est celle que personne ne regarde, et c'est pourtant elle qui
+ * fait qu'un même nombre de calories ne se vaut pas d'un nutriment à
+ * l'autre. Les deux sont donc mis côte à côte.
+ */
+export function FigureMacros() {
+  const macros = [
+    { nom: 'Protéines', kcal: 4, cout: '20 à 30 %', couleur: identites.proteines.couleur },
+    { nom: 'Glucides', kcal: 4, cout: '5 à 10 %', couleur: identites.glucides.couleur },
+    { nom: 'Lipides', kcal: 9, cout: '0 à 3 %', couleur: identites.lipides.couleur },
+  ]
+
+  const gauche = 66
+  const large = 118
+  const y = (i: number) => 30 + i * 28
+
+  return (
+    <Figure legende="Pour chaque macronutriment : l'énergie contenue dans un gramme, et la part de cette énergie que la digestion consomme pour le traiter. Les protéines coûtent cher à digérer, les lipides presque rien. Ordres de grandeur mesurés sur des repas complets.">
+      <svg viewBox="0 0 340 122" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Énergie par gramme et coût digestif des trois macronutriments">
+        <text x={gauche} y="18" style={{ ...stylePetit, fontSize: 8 }}>
+          énergie par gramme
+        </text>
+        <text x="248" y="18" style={{ ...stylePetit, fontSize: 8 }}>
+          coût digestif
+        </text>
+        {macros.map((m, i) => (
+          <g key={m.nom}>
+            <text x={gauche - 6} y={y(i) + 11} textAnchor="end"
+              style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+              {m.nom}
+            </text>
+            <rect x={gauche} y={y(i)} width={(m.kcal / 9) * large} height="14" rx="1" fill={m.couleur} />
+            <text x={gauche + (m.kcal / 9) * large + 6} y={y(i) + 11}
+              style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+              {m.kcal} kcal
+            </text>
+            <text x="248" y={y(i) + 11} style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+              {m.cout}
+            </text>
+          </g>
+        ))}
+        <line x1="240" x2="240" y1="24" y2="112" stroke={palette.piste} strokeWidth="1" />
+      </svg>
+    </Figure>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /* Le face-à-face des deux hormones de la faim                        */
 /* ------------------------------------------------------------------ */
@@ -763,6 +814,7 @@ export const composantsFigures = {
   FigureTrajet,
   FigureReserves,
   FigureDeuxCents,
+  FigureMacros,
   FigureSignaux,
   FigureVitesse,
   FigureGlycemie,
