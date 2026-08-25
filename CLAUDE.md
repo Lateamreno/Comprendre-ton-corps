@@ -23,7 +23,9 @@ Ces cinq points ne se négocient pas. Toute proposition qui les contredit doit �
 2. **Pas de `next/font/google`.** Les polices sont auto-hébergées dans `/public/fonts` et déclarées en `@font-face`. (Cause connue d'échecs de build sur Vercel.)
 3. **`vercel.json` à la racine avec `{ "framework": "nextjs" }`**, Root Directory vide dans les réglages Vercel, branche `main` toujours buildable.
 4. **Une DP = un fichier.** Pas de base de données, pas de CMS, pas de Supabase. Le contenu est versionné dans Git.
-5. **Le texte reste descriptif.** Le livre explique des mécanismes et laisse le lecteur décider. Pas de conseil personnalisé, pas d'objectif chiffré, pas de plan alimentaire, pas d'injonction, pas d'adresse au lecteur dans le corps du texte. Cette règle vaut aussi pour tout texte d'interface.
+5. **Le corps du texte reste descriptif ; la conclusion conseille.** Le livre explique des mécanismes et laisse le lecteur décider. Dans le corps d'une page : pas de conseil, pas d'objectif chiffré, pas de plan alimentaire, pas d'injonction, pas d'adresse au lecteur. Cette règle vaut aussi pour tout texte d'interface.
+
+   Une exception, et une seule : le bloc « Dans les deux sens » qui referme une page. Il tire la conclusion pratique du mécanisme, pour qui cherche à perdre du poids et pour qui cherche à en prendre. Il conseille, à l'infinitif, sans tutoyer et sans promettre de résultat. **Chaque conseil doit découler d'un mécanisme décrit dans la page même et reposer sur ses sources.** Un conseil qui suppose autre chose que ce que la page a démontré n'a pas sa place : on complète la page, ou on retire le conseil.
 
 ## 3. Stack
 
