@@ -661,9 +661,48 @@ export function Volet({
   )
 }
 
+/**
+ * Le même mécanisme, lu dans les deux sens.
+ *
+ * Le livre s'adresse à deux publics opposés, et un mécanisme n'a pas les
+ * mêmes conséquences selon le côté d'où on le regarde. Ce bloc referme une
+ * page en montrant les deux lectures côte à côte.
+ *
+ * Il décrit ce que le mécanisme rend possible ; il ne dit pas quoi faire.
+ * C'est la règle du livre (CLAUDE.md §2.5) : pas de conseil, pas
+ * d'injonction, pas d'adresse au lecteur. « La vague passe si rien ne la
+ * nourrit » est une description ; « attendez vingt minutes » n'en est pas
+ * une.
+ */
+export function DeuxSens({ perdre, prendre }: { perdre: string; prendre: string }) {
+  const lignes: [string, string][] = [
+    ['Pour perdre du poids', perdre],
+    ['Pour en prendre', prendre],
+  ]
+
+  return (
+    <aside
+      style={{
+        margin: '1.2em 0 0.4em',
+        paddingTop: '0.5em',
+        borderTop: `2px solid ${palette.texte}`,
+        breakInside: 'avoid',
+      }}
+    >
+      {lignes.map(([titre, texte], i) => (
+        <p key={titre} style={{ margin: i === 0 ? 0 : '0.45em 0 0', textAlign: 'left' }}>
+          <strong style={{ fontFamily: polices.fiche, fontWeight: 600 }}>{titre}. </strong>
+          {texte}
+        </p>
+      ))}
+    </aside>
+  )
+}
+
 /** À enregistrer dans les rendus MDX, lecture comme spread. */
 export const composantsFigures = {
   Volet,
+  DeuxSens,
   Figure,
   FigureVidange,
   FigureTrajet,
