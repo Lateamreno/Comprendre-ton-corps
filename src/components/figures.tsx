@@ -428,6 +428,52 @@ export function FigureTrajet() {
   )
 }
 
+/**
+ * Les deux réserves du corps, à la même échelle.
+ *
+ * Tout l'intérêt de la figure est dans la disproportion : dessinées avec la
+ * même règle, la réserve de sucre est un trait et celle de gras occupe la
+ * page. C'est pourquoi les deux barres partagent la même origine, et
+ * pourquoi le glycogène n'est pas agrandi pour le rendre lisible.
+ */
+export function FigureReserves() {
+  const gauche = 14
+  const large = 300
+  /* Ordres de grandeur pour un adulte de 70 kg à 20 % de masse grasse. */
+  const gras = 110000
+  const glycogene = 2000
+  const l = (kcal: number) => Math.max((kcal / gras) * large, 2)
+
+  return (
+    <Figure legende="Les deux réserves d'un adulte de 70 kg, dessinées à la même échelle. Le sucre mis de côté tient dans un trait : il couvre moins d'une journée. Le gras couvre des semaines. Ordres de grandeur, pas mesures individuelles.">
+      <svg viewBox="0 0 340 130" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="La réserve de glycogène comparée à la réserve de graisse, à la même échelle">
+        <text x={gauche} y="18" style={{ ...styleEtiquette, fontSize: 10, fill: identites.glucides.couleur }}>
+          le glycogène, le sucre mis de côté
+        </text>
+        <rect x={gauche} y="24" width={l(glycogene)} height="16" rx="1" fill={identites.glucides.couleur} />
+        <line x1={gauche + l(glycogene)} x2={gauche + 62} y1="32" y2="32"
+          stroke={palette.texteFaible} strokeWidth="0.8" />
+        <text x={gauche + 66} y="35" style={{ ...stylePetit, fontSize: 9 }}>
+          ≈ 2 000 kcal, moins d&rsquo;une journée
+        </text>
+
+        <text x={gauche} y="68" style={{ ...styleEtiquette, fontSize: 10, fill: identites.lipides.couleur }}>
+          le gras
+        </text>
+        <rect x={gauche} y="74" width={l(gras)} height="16" rx="1" fill={identites.lipides.couleur} />
+        <text x={gauche + 6} y="86" style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+          ≈ 110 000 kcal, plusieurs semaines
+        </text>
+
+        <text x={gauche} y="114" style={{ ...stylePetit, fontSize: 9 }}>
+          même échelle pour les deux barres
+        </text>
+      </svg>
+    </Figure>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /* Le face-à-face des deux hormones de la faim                        */
 /* ------------------------------------------------------------------ */
@@ -621,6 +667,7 @@ export const composantsFigures = {
   Figure,
   FigureVidange,
   FigureTrajet,
+  FigureReserves,
   FigureSignaux,
   FigureVitesse,
   FigureGlycemie,
