@@ -1005,6 +1005,118 @@ export function FigureSucre() {
   )
 }
 
+/**
+ * Les quatre postes de la dépense d'une journée.
+ *
+ * Une seule barre empilée, parce que le propos est une part d'un tout :
+ * ce que le corps dépense sans rien faire domine, et la séance de sport,
+ * qui occupe toute la place dans les esprits, occupe la plus petite part
+ * du dessin. Les fourchettes sont écrites sous chaque segment, la couleur
+ * ne portant ici qu'une distinction, pas une valeur.
+ */
+export function FigurePostes() {
+  const postes = [
+    { nom: 'Métabolisme de base', part: 62, plage: '60 à 70 %', couleur: palette.violet },
+    { nom: 'Mouvement ordinaire', part: 20, plage: '15 à 30 %', couleur: palette.bleu },
+    { nom: 'Digestion', part: 10, plage: '10 %', couleur: palette.jaune },
+    { nom: 'Séances de sport', part: 8, plage: '0 à 10 %', couleur: palette.orange },
+  ]
+
+  const gauche = 12
+  const large = 316
+  const hauteur = 26
+  const hautBarre = 24
+  let curseur = gauche
+
+  const segments = postes.map((p) => {
+    const l = (p.part / 100) * large
+    const x = curseur
+    curseur += l
+    return { ...p, x, l }
+  })
+
+  return (
+    <Figure legende="La dépense d'une journée, répartie entre ses quatre postes, chez un adulte peu sportif. Les proportions varient d'une personne à l'autre : les fourchettes portées sous la barre sont celles que la littérature retient. Le poste le plus gros ne se ressent pas, et le plus petit est le seul qu'on décide.">
+      <svg viewBox="0 0 340 120" style={{ width: '96%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Répartition de la dépense énergétique quotidienne en quatre postes">
+        {segments.map((p) => (
+          <rect key={p.nom} x={p.x} y={hautBarre} width={p.l} height={hauteur} fill={p.couleur} />
+        ))}
+        {segments.map((p, i) => {
+          const colonne = i % 2
+          const rang = Math.floor(i / 2)
+          const xLeg = gauche + colonne * 168
+          const yLeg = hautBarre + hauteur + 20 + rang * 22
+          return (
+            <g key={p.nom}>
+              <rect x={xLeg} y={yLeg - 8} width="9" height="9" rx="1.5" fill={p.couleur} />
+              <text x={xLeg + 14} y={yLeg}
+                style={{ ...styleEtiquette, fontSize: 9.5, fill: palette.texte }}>
+                {p.nom}
+              </text>
+              <text x={xLeg + 14} y={yLeg + 10} style={{ ...stylePetit, fontSize: 8 }}>
+                {p.plage}
+              </text>
+            </g>
+          )
+        })}
+        <text x={gauche} y="16" style={{ ...stylePetit, fontSize: 9 }}>
+          une journée de dépense, de gauche à droite
+        </text>
+      </svg>
+    </Figure>
+  )
+}
+
+/**
+ * Ce que consomment les organes au repos.
+ *
+ * La dépense de base n'est pas une propriété abstraite : c'est la somme de
+ * ce que coûtent quelques organes, et la répartition explique pourquoi la
+ * masse maigre pèse tant. Les barres sont proportionnelles à la part, et
+ * chaque part est écrite.
+ */
+export function FigureOrganes() {
+  /* Adulte de 70 kg, d'après les vitesses métaboliques spécifiques d'Elia. */
+  const organes = [
+    { nom: 'Muscles', part: 22, couleur: palette.vert },
+    { nom: 'Foie', part: 21, couleur: palette.violet },
+    { nom: 'Cerveau', part: 20, couleur: palette.bleu },
+    { nom: 'Cœur', part: 9, couleur: palette.rouge },
+    { nom: 'Reins', part: 8, couleur: palette.orange },
+    { nom: 'Graisse', part: 4, couleur: palette.jaune },
+    { nom: 'Tout le reste', part: 16, couleur: palette.piste },
+  ]
+
+  const gauche = 84
+  const large = 176
+  const y = (i: number) => 18 + i * 18
+
+  return (
+    <Figure legende="Part de la dépense au repos attribuable à chaque organe, chez un adulte de soixante-dix kilos. Trois organes qui pèsent moins de quatre kilos ensemble — foie, cerveau, cœur — consomment la moitié du total, tandis que quinze kilos de graisse en consomment un vingt-cinquième. Source : vitesses métaboliques spécifiques mesurées par organe.">
+      <svg viewBox="0 0 340 148" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Part de chaque organe dans la dépense au repos">
+        {organes.map((o, i) => {
+          const l = (o.part / 25) * large
+          return (
+            <g key={o.nom}>
+              <text x={gauche - 6} y={y(i) + 10} textAnchor="end"
+                style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+                {o.nom}
+              </text>
+              <rect x={gauche} y={y(i)} width={l} height="12" rx="1" fill={o.couleur} />
+              <text x={gauche + l + 6} y={y(i) + 10}
+                style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+                {`${o.part} %`}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1020,4 +1132,6 @@ export const composantsFigures = {
   FigureEau,
   FigureIndiceCharge,
   FigureSucre,
+  FigurePostes,
+  FigureOrganes,
 }

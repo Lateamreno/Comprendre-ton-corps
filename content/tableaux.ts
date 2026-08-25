@@ -163,28 +163,6 @@ export const tableaux = {
       { code: '19593', nom: 'Yaourt nature', portion: 125, mesure: 'un pot' },
     ],
   },
-  encasDenses: {
-    titre: 'Les plus concentrés',
-    lignes: [
-      { code: '17270', nom: "Huile d'olive", portion: 10, mesure: 'une cuillère' },
-      { code: '15005', nom: 'Noix', portion: 30, mesure: 'une poignée' },
-      { code: '4004', nom: 'Chips', portion: 30, mesure: 'une poignée' },
-      { code: '31004', nom: 'Chocolat au lait', portion: 25, mesure: 'cinq carrés' },
-      { code: '13046', nom: 'Raisins secs', portion: 40, mesure: 'une poignée' },
-      { code: '7615', nom: 'Croissant', portion: 60, mesure: 'une pièce' },
-    ],
-  },
-  encasVolumineux: {
-    titre: 'Les plus volumineux',
-    lignes: [
-      { code: '9230', nom: 'Pop-corn salé', portion: 30, mesure: 'un bol' },
-      { code: '19644', nom: 'Fromage blanc 0 %', portion: 200, mesure: 'un grand pot' },
-      { code: '22010', nom: 'Œuf dur', portion: 50, mesure: 'un œuf' },
-      { code: '13014', nom: 'Fraises', portion: 200, mesure: 'une coupelle' },
-      { code: '13039', nom: 'Pomme', portion: 150, mesure: 'une moyenne' },
-      { code: '20009', nom: 'Carottes crues', portion: 150, mesure: 'quelques bâtonnets' },
-    ],
-  },
 } as const satisfies Record<string, JeuTableau>
 
 export type CleTableau = keyof typeof tableaux
