@@ -1,4 +1,5 @@
 import { tableaux, type CleTableau, type LigneAliment } from '@content/tableaux'
+import { sports, poidsReference, type CleSports, type LigneSport } from '@content/sports'
 import { alimentCiqual, nombre, pourPortion, type Mesure } from '@/lib/ciqual'
 import { palette, polices } from '@/lib/tokens'
 
@@ -135,4 +136,116 @@ export function TableAliments({
   )
 }
 
-export const composantsTables = { TableAliments }
+/**
+ * Le tableau des activités.
+ *
+ * Il partage la grammaire du tableau d'aliments — une ligne, une portion,
+ * des colonnes calculées — mais la « portion » y est une durée. La dépense
+ * n'est jamais saisie : elle vient du MET, du poids de référence et de la
+ * durée, ce qui garantit que deux lignes sont comparées par la même règle.
+ *
+ * La colonne de l'impact est là parce que la dépense seule conseillerait
+ * la corde à sauter à tout le monde.
+ */
+export function TableSports({
+  jeu,
+  nouvellePage = false,
+}: {
+  /** Clé du jeu de lignes dans content/sports.ts. */
+  jeu: CleSports
+  nouvellePage?: boolean
+}) {
+  const { titre, lignes }: { titre: string; lignes: readonly LigneSport[] } = sports[jeu]
+
+  /** Dépense d'une activité, en kilocalories, pour la durée indiquée. */
+  const depense = (met: number, minutes: number) =>
+    (met * 3.5 * poidsReference * minutes) / 200
+
+  const cellule: React.CSSProperties = {
+    fontFamily: polices.chiffre,
+    fontSize: '0.68em',
+    padding: '0.28em 0.2em',
+    textAlign: 'right',
+    borderBottom: `1px solid ${palette.piste}`,
+    fontVariantNumeric: 'tabular-nums',
+  }
+  const entete: React.CSSProperties = {
+    ...cellule,
+    fontSize: '0.58em',
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: palette.texteFaible,
+    borderBottom: `1px solid ${palette.texte}`,
+    verticalAlign: 'bottom',
+  }
+
+  return (
+    <section
+      style={{
+        breakBefore: nouvellePage ? 'column' : 'auto',
+        breakInside: 'avoid',
+        margin: '0 0 1em',
+      }}
+    >
+      <h2
+        style={{
+          fontFamily: polices.titre,
+          fontSize: '1.05em',
+          fontWeight: 600,
+          margin: '0 0 0.4em',
+        }}
+      >
+        {titre}
+      </h2>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={{ ...entete, textAlign: 'left' }}>Activité</th>
+            <th style={entete}>MET</th>
+            <th style={entete}>30 min</th>
+            <th style={entete}>60 min</th>
+            <th style={{ ...entete, textAlign: 'left', paddingLeft: '0.8em' }}>Impact</th>
+            <th style={{ ...entete, textAlign: 'left' }}>Sollicite</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lignes.map((l) => (
+            <tr key={l.nom}>
+              <td style={{ ...cellule, textAlign: 'left', fontFamily: polices.fiche }}>
+                {l.nom}
+              </td>
+              <td style={cellule}>{l.met.toFixed(1).replace('.', ',')}</td>
+              <td style={cellule}>{arrondi(depense(l.met, 30))}</td>
+              <td style={cellule}>{arrondi(depense(l.met, 60))}</td>
+              <td style={{ ...cellule, textAlign: 'left', paddingLeft: '0.8em' }}>
+                {l.impact}
+              </td>
+              <td style={{ ...cellule, textAlign: 'left', color: palette.texteFaible }}>
+                {l.sollicite}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p
+        style={{
+          fontFamily: polices.chiffre,
+          fontSize: '0.6em',
+          lineHeight: 1.5,
+          color: palette.texteFaible,
+          margin: '0.4em 0 0',
+        }}
+      >
+        Le MET est le coût du repos assis : une activité à huit METs coûte
+        huit fois ce que coûte rester assis, pour la même durée. Les
+        kilocalories sont calculées à partir de ce coût pour un adulte de{' '}
+        {poidsReference} kg, et changent proportionnellement avec le poids.
+        L’impact décrit la charge subie par les articulations, que la
+        dépense ne dit pas. Source : compendium des activités physiques,
+        2011.
+      </p>
+    </section>
+  )
+}
+
+export const composantsTables = { TableAliments, TableSports }
