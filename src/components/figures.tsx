@@ -1117,6 +1117,114 @@ export function FigureOrganes() {
   )
 }
 
+/**
+ * Ce que fait la synthèse protéique après une séance.
+ *
+ * Le propos de la page est que la croissance a lieu au repos, pas à
+ * l'effort : la courbe doit donc montrer que la séance est un instant et
+ * que l'adaptation est une plage de plusieurs jours. La zone au-dessus du
+ * niveau de repos porte l'information, la ligne de repos sert de repère.
+ */
+export function FigureSynthese() {
+  const x = (h: number) => 62 + (h / 72) * 250
+  const y = (v: number) => 150 - v * 96
+
+  /* Allures d'après les mesures de synthèse protéique post-effort. */
+  const points: [number, number][] = [
+    [0, 0.18], [3, 0.72], [10, 0.95], [24, 1], [36, 0.82],
+    [48, 0.55], [60, 0.33], [72, 0.2],
+  ]
+  const tracesXY = points.map(([h, v]) => [x(h), y(v)] as [number, number])
+  const courbe = courbeLissee(tracesXY)
+  const aire = `${courbe} L${x(72).toFixed(1)} ${y(0.18).toFixed(1)} L${x(0).toFixed(1)} ${y(0.18).toFixed(1)} Z`
+
+  return (
+    <Figure legende="Vitesse à laquelle le muscle fabrique de la protéine, après une séance de renforcement. La séance est l'instant zéro ; la fabrication monte pendant les heures qui suivent, culmine vers vingt-quatre heures et reste au-dessus du niveau de repos pendant un à trois jours. Toute la zone teintée se déroule après la séance, à l'arrêt. Allure schématique d'après les mesures publiées.">
+      <svg viewBox="0 0 340 186" style={{ width: '84%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Synthèse protéique élevée pendant un à trois jours après une séance">
+        <path d={aire} fill={identites.proteines.couleur} fillOpacity="0.16" />
+        <line x1={x(0)} y1={y(0.18)} x2={x(72)} y2={y(0.18)} stroke={palette.texteFaible}
+          strokeWidth="0.8" strokeDasharray="3 3" />
+        <text x={x(72) + 4} y={y(0.18) + 3} style={{ ...stylePetit, fontSize: 8 }}>repos</text>
+        <path d={courbe} fill="none" stroke={identites.proteines.couleur} strokeWidth="2.4"
+          strokeLinecap="round" strokeLinejoin="round" />
+
+        <line x1={x(0)} y1={y(1.06)} x2={x(0)} y2={y(0.02)} stroke={palette.texte} strokeWidth="1.2" />
+        <text x={x(0)} y={y(1.06) - 5} textAnchor="middle"
+          style={{ ...styleEtiquette, fontSize: 9, fill: palette.texte }}>
+          la séance
+        </text>
+
+        <text x={x(5)} y={y(0.3)} style={{ ...styleEtiquette, fontSize: 9.5, fill: palette.texte }}>
+          le muscle se construit ici
+        </text>
+
+        {[0, 24, 48, 72].map((h) => (
+          <g key={h}>
+            <line x1={x(h)} y1={y(0.02)} x2={x(h)} y2={y(0.02) + 4} stroke={palette.texteFaible} strokeWidth="0.8" />
+            <text x={x(h)} y={y(0.02) + 15} textAnchor="middle" style={{ ...stylePetit, fontSize: 9 }}>
+              {h === 0 ? '0' : `${h} h`}
+            </text>
+          </g>
+        ))}
+        <text x={x(36)} y={y(0.02) + 29} textAnchor="middle" style={{ ...stylePetit, fontSize: 8 }}>
+          temps écoulé depuis la séance
+        </text>
+        <text x="16" y={y(0.05)} style={{ ...stylePetit, fontSize: 8 }} transform={`rotate(-90 16 ${y(0.05)})`}>
+          fabrication de protéine
+        </text>
+      </svg>
+    </Figure>
+  )
+}
+
+/**
+ * Le volume hebdomadaire et ce qu'il rapporte.
+ *
+ * Trois barres suffisent : la relation est graduelle, connue, et c'est
+ * son caractère graduel qui est le message — il n'y a pas de seuil
+ * magique, il y a une pente.
+ */
+export function FigureVolume() {
+  /* Méta-analyse dose-réponse du volume hebdomadaire par groupe musculaire. */
+  const paliers = [
+    { nom: 'Moins de 5 séries', gain: 5.4 },
+    { nom: '5 à 9 séries', gain: 6.6 },
+    { nom: '10 séries et plus', gain: 9.8 },
+  ]
+
+  const gauche = 118
+  const large = 150
+  const max = 11
+  const y = (i: number) => 34 + i * 30
+
+  return (
+    <Figure legende="Gain de masse musculaire mesuré selon le nombre de séries hebdomadaires consacrées à un même groupe musculaire, d'après la méta-analyse de référence. La relation est graduelle : il n'existe pas de seuil au-delà duquel tout se déclenche. Les pourcentages sont des moyennes d'essais de durées variables ; l'ordre compte plus que la valeur.">
+      <svg viewBox="0 0 340 130" style={{ width: '95%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Gain musculaire selon le volume hebdomadaire, en trois paliers">
+        <text x={gauche} y="18" style={{ ...stylePetit, fontSize: 9 }}>
+          gain de masse musculaire
+        </text>
+        {paliers.map((p, i) => (
+          <g key={p.nom}>
+            <text x={gauche - 8} y={y(i) + 12} textAnchor="end"
+              style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+              {p.nom}
+            </text>
+            <rect x={gauche} y={y(i)} width={large} height="16" rx="1" fill={palette.piste} />
+            <rect x={gauche} y={y(i)} width={(p.gain / max) * large} height="16" rx="1"
+              fill={identites.proteines.couleur} />
+            <text x={gauche + (p.gain / max) * large + 6} y={y(i) + 12}
+              style={{ ...stylePetit, fontSize: 9.5, fill: palette.texte }}>
+              {`+ ${p.gain.toFixed(1).replace('.', ',')} %`}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1134,4 +1242,6 @@ export const composantsFigures = {
   FigureSucre,
   FigurePostes,
   FigureOrganes,
+  FigureSynthese,
+  FigureVolume,
 }
