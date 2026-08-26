@@ -1225,6 +1225,82 @@ export function FigureVolume() {
   )
 }
 
+/**
+ * La « zone brûle-graisse », remise dans son contexte.
+ *
+ * Deux séances de même durée : l'une modérée, l'autre intense. La part
+ * de graisse est bien plus élevée à basse intensité, et pourtant les
+ * grammes de graisse consommés sont voisins, parce que le total est plus
+ * grand de l'autre côté. Les deux barres sont donc empilées sur la même
+ * échelle, et la part de graisse est écrite en clair sous chacune.
+ */
+export function FigureZoneBrulage() {
+  const seances = [
+    { nom: 'Effort modéré', total: 300, partGras: 0.6, exemple: 'marche rapide' },
+    { nom: 'Effort intense', total: 500, partGras: 0.35, exemple: 'course' },
+  ]
+
+  const bas = 128
+  const haut = 30
+  const max = 520
+  const largeur = 62
+  const x = (i: number) => 96 + i * 132
+  const y = (kcal: number) => bas - (kcal / max) * (bas - haut)
+
+  return (
+    <Figure legende="Deux séances de quarante-cinq minutes, chez un même adulte. À effort modéré, la graisse fournit une plus grande part de l'énergie ; à effort intense, une part plus faible d'un total plus grand. Les grammes de graisse consommés pendant la séance finissent voisins, et le total dépensé, lui, ne l'est pas. Ordres de grandeur.">
+      <svg viewBox="0 0 340 172" style={{ width: '92%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Énergie et part de graisse de deux séances d'intensités différentes">
+        <line x1="70" y1={bas} x2="316" y2={bas} stroke={palette.texteFaible} strokeWidth="0.8" />
+        {seances.map((s, i) => {
+          const gras = s.total * s.partGras
+          const hautTotal = y(s.total)
+          const hautGras = y(gras)
+          return (
+            <g key={s.nom}>
+              <rect x={x(i)} y={hautTotal} width={largeur} height={bas - hautTotal} rx="1"
+                fill={identites.glucides.couleur} fillOpacity="0.35" />
+              <rect x={x(i)} y={hautGras} width={largeur} height={bas - hautGras} rx="1"
+                fill={identites.lipides.couleur} />
+              <text x={x(i) + largeur / 2} y={hautTotal - 16} textAnchor="middle"
+                style={{ ...styleEtiquette, fontSize: 10, fill: palette.texte }}>
+                {s.nom}
+              </text>
+              <text x={x(i) + largeur / 2} y={hautTotal - 6} textAnchor="middle"
+                style={{ ...stylePetit, fontSize: 8 }}>
+                {s.exemple}
+              </text>
+              <text x={x(i) + largeur + 6} y={hautTotal + 10}
+                style={{ ...stylePetit, fontSize: 8.5, fill: palette.texte }}>
+                {`${s.total} kcal`}
+              </text>
+              <text x={x(i) + largeur + 6} y={hautGras + 11}
+                style={{ ...stylePetit, fontSize: 8.5, fill: palette.texte }}>
+                {`${Math.round(gras)} kcal`}
+              </text>
+              <text x={x(i) + largeur / 2} y={bas + 13} textAnchor="middle"
+                style={{ ...stylePetit, fontSize: 8 }}>
+                {`${Math.round(s.partGras * 100)} % de graisse`}
+              </text>
+            </g>
+          )
+        })}
+        <g>
+          <rect x="70" y="152" width="9" height="9" rx="1.5" fill={identites.lipides.couleur} />
+          <text x="84" y="160" style={{ ...stylePetit, fontSize: 8.5, fill: palette.texte }}>
+            venu de la graisse
+          </text>
+          <rect x="188" y="152" width="9" height="9" rx="1.5"
+            fill={identites.glucides.couleur} fillOpacity="0.35" />
+          <text x="202" y="160" style={{ ...stylePetit, fontSize: 8.5, fill: palette.texte }}>
+            venu du reste
+          </text>
+        </g>
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1244,4 +1320,5 @@ export const composantsFigures = {
   FigureOrganes,
   FigureSynthese,
   FigureVolume,
+  FigureZoneBrulage,
 }
