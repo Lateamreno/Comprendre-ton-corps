@@ -1301,6 +1301,66 @@ export function FigureZoneBrulage() {
   )
 }
 
+/**
+ * Ce que la règle des sept mille calories prédit, et ce qu'on mesure.
+ *
+ * La règle traite le corps comme un compte en banque : un déficit constant
+ * donnerait une perte constante, donc une droite. La mesure donne une
+ * courbe qui s'infléchit et se stabilise. L'écart entre les deux tracés
+ * est tout le sujet de la partie, et il faut donc les superposer.
+ */
+export function FigurePlateau() {
+  const x = (mois: number) => 66 + (mois / 24) * 244
+  const y = (kg: number) => 30 + (kg / 26) * 112
+
+  /* Déficit constant de 500 kcal/jour, adulte de 100 kg. */
+  const droite: [number, number][] = [[0, 0], [24, 25]]
+  const reelle: [number, number][] = [
+    [0, 0], [3, 5.2], [6, 8.4], [9, 10.3], [12, 11.4],
+    [15, 11.8], [18, 11.9], [21, 11.9], [24, 11.9],
+  ]
+
+  const tracer = (pts: [number, number][]) =>
+    courbeLissee(pts.map(([m, kg]) => [x(m), y(kg)] as [number, number]))
+
+  return (
+    <Figure legende="Perte de poids attendue et perte observée, pour un même déficit quotidien maintenu deux ans. La règle qui convertit sept mille kilocalories en un kilo de graisse donne une droite : elle suppose que le corps ne change pas. La mesure donne une courbe qui s'infléchit dès les premiers mois et se stabilise vers la première année, parce que la dépense baisse en même temps que le poids. Allures d'après les modèles validés sur données mesurées.">
+      <svg viewBox="0 0 340 178" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Perte de poids prédite en ligne droite et perte réelle qui plafonne">
+        {[0, 10, 20].map((kg) => (
+          <g key={kg}>
+            <line x1={x(0)} y1={y(kg)} x2={x(24)} y2={y(kg)} stroke={palette.piste} strokeWidth="0.8" />
+            <text x={x(0) - 6} y={y(kg) + 3} textAnchor="end" style={{ ...stylePetit, fontSize: 8.5 }}>
+              {kg === 0 ? '0' : `− ${kg} kg`}
+            </text>
+          </g>
+        ))}
+
+        <path d={tracer(droite)} fill="none" stroke={palette.texteFaible} strokeWidth="1.6"
+          strokeDasharray="5 4" strokeLinecap="round" />
+        <path d={tracer(reelle)} fill="none" stroke={palette.vert} strokeWidth="2.4"
+          strokeLinecap="round" strokeLinejoin="round" />
+
+        <text x={x(17)} y={y(21.5)} style={{ ...styleEtiquette, fontSize: 9, fill: palette.texteFaible }}>
+          ce que la règle prédit
+        </text>
+        <text x={x(13.5)} y={y(10.4)} style={{ ...styleEtiquette, fontSize: 9, fill: palette.vert }}>
+          ce qu&rsquo;on mesure
+        </text>
+
+        {[0, 6, 12, 18, 24].map((m) => (
+          <g key={m}>
+            <line x1={x(m)} y1={y(26)} x2={x(m)} y2={y(26) + 4} stroke={palette.texteFaible} strokeWidth="0.8" />
+            <text x={x(m)} y={y(26) + 15} textAnchor="middle" style={{ ...stylePetit, fontSize: 8.5 }}>
+              {m === 0 ? '0' : `${m} mois`}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1321,4 +1381,5 @@ export const composantsFigures = {
   FigureSynthese,
   FigureVolume,
   FigureZoneBrulage,
+  FigurePlateau,
 }
