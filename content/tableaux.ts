@@ -163,6 +163,34 @@ export const tableaux = {
       { code: '19593', nom: 'Yaourt nature', portion: 125, mesure: 'un pot' },
     ],
   },
+  restaurationRapide: {
+    titre: 'Un menu, pièce par pièce',
+    lignes: [
+      { code: '25413', nom: 'Hamburger', portion: 110, mesure: 'un burger' },
+      { code: '25414', nom: 'Cheeseburger', portion: 120, mesure: 'un burger' },
+      { code: '25502', nom: 'Burger au poulet', portion: 170, mesure: 'un burger' },
+      { code: '4032', nom: 'Frites', portion: 110, mesure: 'moyenne portion' },
+      { code: '25404', nom: 'Pizza margherita', portion: 350, mesure: 'une pizza' },
+      { code: '25666', nom: 'Salade en barquette', portion: 250, mesure: 'avec sa sauce' },
+      { code: '18018', nom: 'Cola', portion: 330, mesure: 'un gobelet moyen' },
+      { code: '39001', nom: 'Milkshake', portion: 300, mesure: 'un gobelet' },
+      { code: '39509', nom: 'Glace en cône', portion: 100, mesure: 'un cône' },
+    ],
+  },
+  boissonsAlcool: {
+    titre: 'Une soirée, verre par verre',
+    lignes: [
+      { code: '5001', nom: 'Bière blonde', portion: 250, mesure: 'un demi' },
+      { code: '5002', nom: 'Bière forte', portion: 330, mesure: 'une bouteille' },
+      { code: '5214', nom: 'Vin rouge', portion: 125, mesure: 'un verre' },
+      { code: '5215', nom: 'Vin blanc sec', portion: 125, mesure: 'un verre' },
+      { code: '5207', nom: 'Champagne', portion: 100, mesure: 'une coupe' },
+      { code: '5003', nom: 'Cidre', portion: 250, mesure: 'un verre' },
+      { code: '18018', nom: 'Cola', portion: 250, mesure: 'un verre' },
+      { code: '4004', nom: 'Chips', portion: 30, mesure: "à l'apéritif" },
+      { code: '15002', nom: 'Cacahuètes salées', portion: 30, mesure: "à l'apéritif" },
+    ],
+  },
 } as const satisfies Record<string, JeuTableau>
 
 export type CleTableau = keyof typeof tableaux
