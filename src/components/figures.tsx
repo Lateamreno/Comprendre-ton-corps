@@ -1497,6 +1497,84 @@ export function FigureArret() {
   )
 }
 
+/**
+ * Les proportions d'une assiette, dessinées plutôt que chiffrées.
+ *
+ * C'est tout le propos de la page : un repère visuel n'a pas besoin
+ * d'être converti pour être appliqué. Le dessin est donc la donnée, et
+ * chaque secteur porte sa part écrite pour que l'information ne repose
+ * pas sur la seule couleur.
+ */
+export function FigureAssiette() {
+  const cx = 108
+  const cy = 84
+  const r = 58
+
+  /* Parts en fractions de tour, dans l'ordre de tracé. */
+  /*
+   * Les trois grandeurs partagent la couleur d'identité verte : la charte
+   * les range dans la même famille. Le secteur se distingue donc par le
+   * ton, et chacun porte son nom en toutes lettres.
+   */
+  const parts = [
+    { nom: 'Légumes et fruits', part: 0.5, couleur: palette.vertTendre, encre: palette.texte, texte: 'la moitié' },
+    { nom: 'Féculents', part: 0.25, couleur: palette.vertClair, encre: palette.texte, texte: 'un quart' },
+    { nom: 'Protéines', part: 0.25, couleur: palette.vert, encre: palette.fondCarte, texte: 'un quart' },
+  ]
+
+  let debut = -0.25
+  const secteurs = parts.map((p) => {
+    const fin = debut + p.part
+    const a1 = debut * 2 * Math.PI
+    const a2 = fin * 2 * Math.PI
+    const x1 = cx + r * Math.cos(a1)
+    const y1 = cy + r * Math.sin(a1)
+    const x2 = cx + r * Math.cos(a2)
+    const y2 = cy + r * Math.sin(a2)
+    const grand = p.part > 0.5 ? 1 : 0
+    const milieu = (debut + fin) / 2 * 2 * Math.PI
+    debut = fin
+    return {
+      ...p,
+      d: `M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${grand} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z`,
+      lx: cx + r * 0.58 * Math.cos(milieu),
+      ly: cy + r * 0.58 * Math.sin(milieu),
+    }
+  })
+
+  return (
+    <Figure legende="Les proportions d'un repas complet, en surface d'assiette et non en grammes. La moitié de légumes porte le volume et les fibres ; le quart de protéines porte la matière à construire et le coût digestif le plus élevé ; le quart de féculents porte le carburant. La matière grasse ajoutée ne figure pas dans le cercle : elle s'ajoute par-dessus, et c'est ce qui la rend facile à oublier.">
+      <svg viewBox="0 0 340 172" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Assiette partagée en moitié de légumes, quart de féculents, quart de protéines">
+        <circle cx={cx} cy={cy} r={r + 7} fill="none" stroke={palette.piste} strokeWidth="2.5" />
+        {secteurs.map((s) => (
+          <g key={s.nom}>
+            <path d={s.d} fill={s.couleur} stroke={palette.fondCarte} strokeWidth="1.6" />
+            <text x={s.lx} y={s.ly + 3} textAnchor="middle"
+              style={{ ...styleEtiquette, fontSize: 9, fill: s.encre }}>
+              {s.texte}
+            </text>
+          </g>
+        ))}
+        {secteurs.map((s, i) => (
+          <g key={`leg-${s.nom}`}>
+            <rect x="212" y={44 + i * 24} width="10" height="10" rx="1.5" fill={s.couleur} />
+            <text x="228" y={53 + i * 24} style={{ ...styleEtiquette, fontSize: 9.5, fill: palette.texte }}>
+              {s.nom}
+            </text>
+          </g>
+        ))}
+        <text x="212" y="126" style={{ ...stylePetit, fontSize: 8 }}>
+          le gras ajouté n&rsquo;est pas
+        </text>
+        <text x="212" y="136" style={{ ...stylePetit, fontSize: 8 }}>
+          dans le cercle
+        </text>
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1520,4 +1598,5 @@ export const composantsFigures = {
   FigurePlateau,
   FigureReponses,
   FigureArret,
+  FigureAssiette,
 }
