@@ -1361,6 +1361,70 @@ export function FigurePlateau() {
   )
 }
 
+/**
+ * Ce qu'un programme d'exercice fait perdre, prévu et observé.
+ *
+ * Le propos de la page est double : la moyenne est très inférieure à la
+ * prévision, et surtout la dispersion est énorme — certains perdent
+ * beaucoup, d'autres prennent. Une moyenne seule masquerait le second
+ * point, la barre d'étendue le montre.
+ */
+export function FigureReponses() {
+  const x = (kg: number) => 56 + ((kg + 15.5) / 18) * 244
+  const axe = 92
+
+  return (
+    <Figure legende="Douze semaines d'exercice supervisé, à raison d'environ deux mille cinq cents kilocalories dépensées par semaine. La perte calculée à partir de cette dépense était de onze kilos ; la perte moyenne observée a été de moins de quatre. Surtout, les résultats individuels vont d'une perte de quinze kilos à une prise de près de deux, pour un entraînement identique et supervisé.">
+      <svg viewBox="0 0 340 150" style={{ width: '94%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Perte de poids prévue et observée après douze semaines d'exercice supervisé">
+        <rect x={x(-14.7)} y={axe - 5} width={x(1.7) - x(-14.7)} height="10" rx="2"
+          fill={palette.vert} fillOpacity="0.18" />
+        <line x1={x(-15.5)} y1={axe} x2={x(2.5)} y2={axe} stroke={palette.texteFaible} strokeWidth="0.8" />
+        {[-15, -10, -5, 0].map((kg) => (
+          <g key={kg}>
+            <line x1={x(kg)} y1={axe + 5} x2={x(kg)} y2={axe + 9} stroke={palette.texteFaible} strokeWidth="0.8" />
+            <text x={x(kg)} y={axe + 20} textAnchor="middle" style={{ ...stylePetit, fontSize: 8.5 }}>
+              {kg === 0 ? '0' : `${kg} kg`}
+            </text>
+          </g>
+        ))}
+        <text x={x(-14.7)} y={axe + 34} style={{ ...stylePetit, fontSize: 8 }}>
+          la barre teintée est l&rsquo;étendue des résultats individuels
+        </text>
+        <text x={x(-14.7)} y={axe + 45} style={{ ...stylePetit, fontSize: 8 }}>
+          variation de poids après douze semaines
+        </text>
+
+        <g>
+          <line x1={x(-10.9)} y1={axe - 6} x2={x(-10.9)} y2={axe - 48} stroke={palette.texteFaible}
+            strokeWidth="1.4" strokeDasharray="3 3" />
+          <circle cx={x(-10.9)} cy={axe} r="3.4" fill={palette.fondCarte}
+            stroke={palette.texteFaible} strokeWidth="1.4" />
+          <text x={x(-10.9)} y={axe - 61} textAnchor="middle"
+            style={{ ...styleEtiquette, fontSize: 9, fill: palette.texteFaible }}>
+            perte calculée
+          </text>
+          <text x={x(-10.9)} y={axe - 52} textAnchor="middle" style={{ ...stylePetit, fontSize: 8.5 }}>
+            − 10,9 kg
+          </text>
+        </g>
+
+        <g>
+          <line x1={x(-3.7)} y1={axe - 6} x2={x(-3.7)} y2={axe - 24} stroke={palette.vert} strokeWidth="2" />
+          <circle cx={x(-3.7)} cy={axe} r="3.4" fill={palette.vert} />
+          <text x={x(-3.7)} y={axe - 37} textAnchor="middle"
+            style={{ ...styleEtiquette, fontSize: 9, fill: palette.vert }}>
+            perte moyenne observée
+          </text>
+          <text x={x(-3.7)} y={axe - 28} textAnchor="middle" style={{ ...stylePetit, fontSize: 8.5 }}>
+            − 3,7 kg
+          </text>
+        </g>
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1382,4 +1446,5 @@ export const composantsFigures = {
   FigureVolume,
   FigureZoneBrulage,
   FigurePlateau,
+  FigureReponses,
 }
