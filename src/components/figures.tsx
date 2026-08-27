@@ -1425,6 +1425,78 @@ export function FigureReponses() {
   )
 }
 
+/**
+ * Ce que devient la perte quand le traitement s'arrête.
+ *
+ * La page dit que ces médicaments agissent tant qu'ils sont pris. Une
+ * courbe qui descend puis remonte après un trait vertical le montre en
+ * une seconde, là où le texte demande un paragraphe. Les deux bras de
+ * l'essai sont tracés, sans quoi la remontée pourrait passer pour une
+ * évolution spontanée.
+ */
+export function FigureArret() {
+  const x = (semaine: number) => 62 + (semaine / 120) * 248
+  const y = (pct: number) => 26 + (-pct / 17) * 104
+
+  const traite: [number, number][] = [
+    [0, 0], [12, -6], [28, -11.2], [44, -13.8], [68, -14.9],
+    [84, -9.5], [104, -6.6], [120, -5.6],
+  ]
+  const temoin: [number, number][] = [
+    [0, 0], [12, -1.4], [28, -2.2], [44, -2.5], [68, -2.4],
+    [84, -1.4], [104, -0.5], [120, -0.1],
+  ]
+  const tracer = (pts: [number, number][]) =>
+    courbeLissee(pts.map(([sem, pct]) => [x(sem), y(pct)] as [number, number]))
+
+  return (
+    <Figure legende="Poids en pourcentage du poids de départ, dans un essai contre placebo. Le traitement est pris pendant soixante-huit semaines, puis arrêté. Le groupe traité perd près de quinze pour cent, puis en reprend les deux tiers dans l'année qui suit l'arrêt ; le groupe témoin revient lui aussi à son point de départ. L'effet est réel et il dure ce que dure le traitement.">
+      <svg viewBox="0 0 340 170" style={{ width: '95%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Perte de poids sous traitement puis reprise après son arrêt">
+        {[0, -5, -10, -15].map((pct) => (
+          <g key={pct}>
+            <line x1={x(0)} y1={y(pct)} x2={x(120)} y2={y(pct)} stroke={palette.piste} strokeWidth="0.8" />
+            <text x={x(0) - 6} y={y(pct) + 3} textAnchor="end" style={{ ...stylePetit, fontSize: 8.5 }}>
+              {pct === 0 ? '0' : `${pct} %`}
+            </text>
+          </g>
+        ))}
+
+        <line x1={x(68)} y1={y(1)} x2={x(68)} y2={y(-16.5)} stroke={palette.texte} strokeWidth="1.2" />
+        <text x={x(68) + 5} y={y(-15.6)} style={{ ...styleEtiquette, fontSize: 9, fill: palette.texte }}>
+          arrêt du traitement
+        </text>
+
+        <path d={tracer(temoin)} fill="none" stroke={palette.texteFaible} strokeWidth="1.8"
+          strokeDasharray="5 4" strokeLinecap="round" />
+        <path d={tracer(traite)} fill="none" stroke={palette.violet} strokeWidth="2.4"
+          strokeLinecap="round" strokeLinejoin="round" />
+
+        <g>
+          <line x1="62" y1="11" x2="80" y2="11" stroke={palette.violet} strokeWidth="2.4" strokeLinecap="round" />
+          <text x="86" y="14" style={{ ...styleEtiquette, fontSize: 9, fill: palette.violet }}>
+            sous traitement
+          </text>
+          <line x1="176" y1="11" x2="194" y2="11" stroke={palette.texteFaible} strokeWidth="1.8"
+            strokeDasharray="5 4" strokeLinecap="round" />
+          <text x="200" y="14" style={{ ...styleEtiquette, fontSize: 9, fill: palette.texteFaible }}>
+            placebo
+          </text>
+        </g>
+
+        {[0, 40, 80, 120].map((sem) => (
+          <g key={sem}>
+            <line x1={x(sem)} y1={y(-16.5)} x2={x(sem)} y2={y(-16.5) + 4} stroke={palette.texteFaible} strokeWidth="0.8" />
+            <text x={x(sem)} y={y(-16.5) + 15} textAnchor="middle" style={{ ...stylePetit, fontSize: 8.5 }}>
+              {sem === 0 ? '0' : `${sem} sem.`}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1447,4 +1519,5 @@ export const composantsFigures = {
   FigureZoneBrulage,
   FigurePlateau,
   FigureReponses,
+  FigureArret,
 }
