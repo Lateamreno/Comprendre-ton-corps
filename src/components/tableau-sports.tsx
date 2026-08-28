@@ -8,7 +8,8 @@ import {
   type CleSports,
   type LigneSport,
 } from '@content/sports'
-import { identites, palette, polices } from '@/lib/tokens'
+import { palette, polices } from '@/lib/tokens'
+import { Vignette } from '@/components/vignette-sport'
 
 /**
  * Le tableau comparatif des activités.
@@ -29,19 +30,46 @@ function depense(met: number, minutes: number) {
 }
 
 const COLONNES = [
-  { titre: 'Activité', sousTitre: 'intensité', gabarit: '1.35fr', aGauche: true },
-  { titre: 'Durée', sousTitre: 'de séance', gabarit: '0.62fr' },
-  { titre: 'Calories', sousTitre: 'brûlées', gabarit: '0.72fr' },
-  { titre: 'Effort', sousTitre: 'musculaire', gabarit: '0.78fr' },
-  { titre: 'Impact', sousTitre: 'cardio', gabarit: '0.78fr' },
-  { titre: 'Fatigue', sousTitre: 'globale', gabarit: '0.62fr' },
-  { titre: 'Articulations', sousTitre: 'charge subie', gabarit: '0.78fr' },
-  { titre: 'Muscles', sousTitre: 'sollicités', gabarit: '1.15fr', aGauche: true },
+  { titre: 'Sport', sousTitre: 'intensité', gabarit: '1.5fr', aGauche: true },
+  { titre: "Type d'effort", sousTitre: 'dominante', gabarit: '0.86fr' },
+  { titre: 'Durée', sousTitre: 'de séance', gabarit: '0.6fr' },
+  { titre: 'Calories', sousTitre: 'brûlées', gabarit: '0.92fr' },
+  { titre: 'Effort', sousTitre: 'musculaire', gabarit: '0.86fr' },
+  { titre: 'Impact', sousTitre: 'cardio', gabarit: '0.86fr' },
+  { titre: 'Fatigue', sousTitre: 'globale', gabarit: '0.6fr' },
+  { titre: 'Muscles', sousTitre: 'sollicités', gabarit: '1.05fr' },
 ] as const
 
 const gabarit = COLONNES.map((c) => c.gabarit).join(' ')
 
-function Cellule({
+/** Repère haut de l'échelle des calories, pour que les tableaux se comparent. */
+const CALORIES_PLEIN = 800
+
+/**
+ * Une case alignée : l'icône, la jauge et le texte occupent trois bandes de
+ * hauteur fixe. C'est ce qui met tous les pictogrammes d'une ligne sur le
+ * même axe, quelle que soit la longueur du mot au-dessous.
+ */
+function CaseAlignee({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: '1.35em 0.95em auto',
+        justifyItems: 'center',
+        alignItems: 'center',
+        rowGap: '0.12em',
+        padding: '0.34em 0.3em',
+        borderLeft: `1px solid ${palette.piste}`,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+/** Une case libre : ni icône ni jauge à aligner. */
+function CaseLibre({
   children,
   aGauche = false,
 }: {
@@ -94,7 +122,7 @@ function Mot({ texte, couleur }: { texte: string; couleur?: string }) {
       style={{
         fontFamily: polices.fiche,
         fontWeight: 600,
-        fontSize: '0.6em',
+        fontSize: '0.58em',
         letterSpacing: '0.02em',
         color: couleur ?? palette.texte,
         textAlign: 'center',
@@ -106,14 +134,46 @@ function Mot({ texte, couleur }: { texte: string; couleur?: string }) {
   )
 }
 
+/** Une barre continue : la grandeur est mesurée, pas appréciée. */
+function BarreValeur({ part, couleur }: { part: number; couleur: string }) {
+  return (
+    <span
+      style={{
+        display: 'block',
+        width: '76%',
+        height: 7,
+        borderRadius: 4,
+        background: palette.piste,
+        overflow: 'hidden',
+      }}
+      aria-hidden="true"
+    >
+      <span
+        style={{
+          display: 'block',
+          width: `${Math.min(100, Math.max(0, part * 100))}%`,
+          height: '100%',
+          borderRadius: 4,
+          background: couleur,
+        }}
+      />
+    </span>
+  )
+}
+
 /** Le vert au plus bas, le rouge au plus haut : la couleur de valeur. */
 function couleurNiveau(niveau: number) {
   return [palette.vertClair, palette.jaune, palette.orange, palette.rouge][niveau - 1]
 }
 
+const ICONE_EFFORT = { endurance: 'endurance', force: 'force', mixte: 'mixte' } as const
+
 function Ligne({ s }: { s: LigneSport }) {
   const kcal = depense(s.met, s.duree)
-  const heures = s.duree >= 60 ? `${(s.duree / 60).toFixed(s.duree % 60 === 0 ? 0 : 1).replace('.', ',')} h` : `${s.duree} min`
+  const heures =
+    s.duree >= 60
+      ? `${(s.duree / 60).toFixed(s.duree % 60 === 0 ? 0 : 1).replace('.', ',')} h`
+      : `${s.duree} min`
 
   return (
     <div
@@ -125,74 +185,79 @@ function Ligne({ s }: { s: LigneSport }) {
         breakInside: 'avoid',
       }}
     >
-      <Cellule aGauche>
-        <span
-          style={{
-            fontFamily: polices.fiche,
-            fontWeight: 700,
-            fontSize: '0.92em',
-            letterSpacing: '0.01em',
-            textTransform: 'uppercase',
-            color: palette.texte,
-            lineHeight: 1.1,
-          }}
-        >
-          {s.nom}
+      <CaseLibre aGauche>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.55em' }}>
+          <Vignette sport={s} />
+          <span style={{ display: 'flex', flexDirection: 'column', gap: '0.12em' }}>
+            <span
+              style={{
+                fontFamily: polices.fiche,
+                fontWeight: 700,
+                fontSize: '0.92em',
+                letterSpacing: '0.01em',
+                textTransform: 'uppercase',
+                color: palette.texte,
+                lineHeight: 1.1,
+              }}
+            >
+              {s.nom}
+            </span>
+            <span
+              style={{
+                fontFamily: polices.fiche,
+                fontWeight: 600,
+                fontSize: '0.56em',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                color: couleurNiveau(s.fatigue),
+              }}
+            >
+              intensité {MOTS_NIVEAU_F[s.fatigue - 1]}
+            </span>
+          </span>
         </span>
-        <span
-          style={{
-            fontFamily: polices.fiche,
-            fontWeight: 600,
-            fontSize: '0.58em',
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
-            color: couleurNiveau(s.fatigue),
-          }}
-        >
-          intensité {MOTS_NIVEAU_F[s.fatigue - 1]}
-        </span>
-      </Cellule>
+      </CaseLibre>
 
-      <Cellule>
-        <Icone nom="chrono" couleur={identites.satiete.couleur} />
+      <CaseAlignee>
+        <Icone nom={ICONE_EFFORT[s.typeEffort]} />
+        <span />
+        <Mot texte={MOTS_EFFORT[s.typeEffort]} />
+      </CaseAlignee>
+
+      <CaseLibre>
+        <Icone nom="chrono" taille={16} />
         <Valeur nombre={heures} />
-      </Cellule>
+      </CaseLibre>
 
-      <Cellule>
-        <Icone nom="flamme" couleur={identites.energie.couleur} />
+      <CaseAlignee>
+        <Icone nom="flamme" />
+        <BarreValeur part={kcal / CALORIES_PLEIN} couleur={palette.orange} />
         <Valeur nombre={Math.round(kcal).toString()} unite="kcal" />
-      </Cellule>
+      </CaseAlignee>
 
-      <Cellule>
-        <Icone nom="haltere" couleur={identites.proteines.couleur} />
+      <CaseAlignee>
+        <Icone nom="haltere" />
         <EchellePoints niveau={s.effortMusculaire} couleur={couleurNiveau(s.effortMusculaire)} />
         <Mot texte={MOTS_NIVEAU[s.effortMusculaire - 1]} />
-      </Cellule>
+      </CaseAlignee>
 
-      <Cellule>
-        <Icone nom="coeur" couleur={palette.rouge} />
+      <CaseAlignee>
+        <Icone nom="coeur" />
         <EchellePoints niveau={s.impactCardio} couleur={couleurNiveau(s.impactCardio)} />
         <Mot texte={MOTS_NIVEAU[s.impactCardio - 1]} />
-      </Cellule>
+      </CaseAlignee>
 
-      <Cellule>
-        <Pile part={s.fatigue / 4} couleur={couleurNiveau(s.fatigue)} hauteur={26} />
-        <Mot texte={MOTS_NIVEAU[s.fatigue - 1]} />
-      </Cellule>
+      <CaseLibre>
+        <Pile part={s.fatigue / 4} couleur={couleurNiveau(s.fatigue)} hauteur={24} />
+        <Mot texte={MOTS_NIVEAU_F[s.fatigue - 1]} />
+      </CaseLibre>
 
-      <Cellule>
-        <Icone nom="articulation" couleur={palette.texteFaible} />
-        <EchellePoints niveau={s.impact} couleur={couleurNiveau(s.impact)} />
-        <Mot texte={MOTS_NIVEAU[s.impact - 1]} />
-        <Mot texte={MOTS_EFFORT[s.typeEffort]} couleur={palette.texteFaible} />
-      </Cellule>
-
-      <Cellule aGauche>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-          <Silhouette face="avant" zones={s.muscles} hauteur={70} />
-          <Silhouette face="arriere" zones={s.muscles} hauteur={70} />
+      <CaseLibre>
+        <span style={{ display: 'flex', alignItems: 'flex-end', gap: '0.35em' }}>
+          <Silhouette face="avant" zones={s.muscles} hauteur={76} />
+          <Silhouette face="arriere" zones={s.muscles} hauteur={76} />
         </span>
-      </Cellule>
+      </CaseLibre>
     </div>
   )
 }

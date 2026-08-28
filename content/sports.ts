@@ -16,7 +16,7 @@ import type { ZoneMuscle } from '@/components/comparatif'
  *   qu'une séance demande. Le tableau les donne pour ce qu'elles sont.
  */
 
-export type NiveauEffort = 'endurance' | 'force' | 'puissance' | 'souplesse'
+export type NiveauEffort = 'endurance' | 'force' | 'mixte'
 
 export type LigneSport = {
   nom: string
@@ -34,6 +34,8 @@ export type LigneSport = {
   fatigue: 1 | 2 | 3 | 4
   /** Nature dominante de l'effort. */
   typeEffort: NiveauEffort
+  /** Chemin d'une photo dans /public/img/sports, quand elle existe. */
+  photo?: string
   /** Ce que la séance sollicite, et à quel degré. */
   muscles: Partial<Record<ZoneMuscle, 'fort' | 'moyen'>>
 }
@@ -83,9 +85,9 @@ export const sports = {
         },
       },
       {
-        nom: 'Corde à sauter', met: 11.8, duree: 30,
+        nom: 'Corde à sauter', met: 11.8, duree: 60,
         impact: 4, effortMusculaire: 2, impactCardio: 4, fatigue: 3,
-        typeEffort: 'puissance',
+        typeEffort: 'mixte',
         muscles: { mollets: 'fort', epaules: 'moyen', quadriceps: 'moyen' },
       },
     ],
@@ -105,31 +107,31 @@ export const sports = {
       {
         nom: 'Haltérophilie', met: 6.0, duree: 60,
         impact: 3, effortMusculaire: 4, impactCardio: 2, fatigue: 4,
-        typeEffort: 'puissance',
+        typeEffort: 'mixte',
         muscles: {
           quadriceps: 'fort', fessiers: 'fort', lombaires: 'fort',
           trapezes: 'fort', epaules: 'moyen',
         },
       },
       {
-        nom: 'Boxe, sac de frappe', met: 5.5, duree: 45,
+        nom: 'Boxe, sac de frappe', met: 5.5, duree: 60,
         impact: 2, effortMusculaire: 3, impactCardio: 4, fatigue: 3,
-        typeEffort: 'puissance',
+        typeEffort: 'mixte',
         muscles: {
           epaules: 'fort', abdominaux: 'fort', pectoraux: 'moyen',
           triceps: 'moyen', mollets: 'moyen',
         },
       },
       {
-        nom: 'Football', met: 7.0, duree: 90,
+        nom: 'Football', met: 7.0, duree: 60,
         impact: 4, effortMusculaire: 2, impactCardio: 4, fatigue: 3,
-        typeEffort: 'endurance',
+        typeEffort: 'mixte',
         muscles: { quadriceps: 'fort', ischios: 'fort', mollets: 'moyen', fessiers: 'moyen' },
       },
       {
         nom: 'Tennis, en simple', met: 7.3, duree: 60,
         impact: 3, effortMusculaire: 2, impactCardio: 3, fatigue: 3,
-        typeEffort: 'puissance',
+        typeEffort: 'mixte',
         muscles: {
           quadriceps: 'fort', epaules: 'fort', avantBras: 'moyen',
           abdominaux: 'moyen', mollets: 'moyen',
@@ -150,15 +152,15 @@ export const sports = {
     titre: 'Activités douces et vie courante',
     lignes: [
       {
-        nom: 'Étirements', met: 2.3, duree: 30,
+        nom: 'Étirements', met: 2.3, duree: 60,
         impact: 1, effortMusculaire: 1, impactCardio: 1, fatigue: 1,
-        typeEffort: 'souplesse',
+        typeEffort: 'force',
         muscles: { ischios: 'moyen', lombaires: 'moyen' },
       },
       {
         nom: 'Yoga, hatha', met: 2.5, duree: 60,
         impact: 1, effortMusculaire: 2, impactCardio: 1, fatigue: 1,
-        typeEffort: 'souplesse',
+        typeEffort: 'force',
         muscles: { abdominaux: 'moyen', epaules: 'moyen', ischios: 'moyen' },
       },
       {
@@ -170,7 +172,7 @@ export const sports = {
       {
         nom: 'Pilates', met: 3.0, duree: 60,
         impact: 1, effortMusculaire: 2, impactCardio: 1, fatigue: 2,
-        typeEffort: 'souplesse',
+        typeEffort: 'force',
         muscles: { abdominaux: 'fort', lombaires: 'moyen', fessiers: 'moyen' },
       },
       {
@@ -202,8 +204,7 @@ export const MOTS_NIVEAU_F = ['faible', 'modérée', 'élevée', 'très élevée
 
 /** Ce que dit chaque nature d'effort, en clair. */
 export const MOTS_EFFORT: Record<NiveauEffort, string> = {
-  endurance: 'effort continu',
-  force: 'effort intermittent',
-  puissance: 'effort explosif',
-  souplesse: 'effort tenu',
+  endurance: 'endurance',
+  force: 'force',
+  mixte: 'mixte',
 }
