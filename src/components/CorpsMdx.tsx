@@ -2,6 +2,8 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
 import { composantsFigures } from '@/components/figures'
 import { composantsTables } from '@/components/tables'
+import { TableSports } from '@/components/tableau-sports'
+import { PleineLargeur } from '@/components/comparatif'
 
 /**
  * Rendu du corps d'une double page.
@@ -47,6 +49,8 @@ const composants = {
   ),
   ...composantsFigures,
   ...composantsTables,
+  TableSports,
+  PleineLargeur,
 }
 
 export function CorpsMdx({ source }: { source: string }) {
