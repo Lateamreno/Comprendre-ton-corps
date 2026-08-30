@@ -193,28 +193,3 @@ h1, h2, h3 {
   }
 }
 
-/* -------------------------------------------------------------------- */
-/* Relecture                                                            */
-/* Le numéro du marqueur est porté par ::after : il n'ajoute aucun      */
-/* caractère au texte, ce qui garde exacts les repérages par contexte.  */
-/* -------------------------------------------------------------------- */
-
-sup.rel-marq {
-  cursor: pointer;
-  user-select: none;
-  margin-left: 2px;
-}
-
-sup.rel-marq::after {
-  content: attr(data-n);
-  display: inline-block;
-  min-width: 1.1rem;
-  padding: 0 0.25rem;
-  border-radius: 999px;
-  background: var(--vert);
-  color: var(--fond-carte);
-  font-family: var(--police-chiffre);
-  font-size: 0.65rem;
-  line-height: 1.5;
-  text-align: center;
-}

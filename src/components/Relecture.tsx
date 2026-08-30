@@ -1,490 +1,519 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
 /**
  * L'outil de relecture de l'auteur.
  *
- * Un bouton flottant ouvre le panneau. « Corriger un passage » passe en mode
- * sélection : on sélectionne du texte comme sur téléphone, une pastille
- * « Noter » apparaît, on écrit ce qu'on veut changer, et à la validation la
- * surbrillance disparaît — seul un numéro reste à côté du passage.
+ * Trois boutons en bas de l'écran, et rien d'autre :
+ * — « Noter » ouvre un encart, on écrit, on valide ;
+ * — « Liste » montre toutes les notes, page par page, avec l'historique des
+ *   pages validées ;
+ * — « Page validée » marque la page comme définitivement relue.
  *
- * Les corrections vivent dans le navigateur (localStorage) et se synchronisent
- * quand c'est configuré vers la branche `corrections` du repo, où Claude les
- * lit pour les appliquer par lot. Sans configuration, un bouton copie le tout
- * pour le coller dans la conversation.
+ * Il n'y a plus de mode sélection : la sélection de texte ne se comporte pas
+ * de la même façon d'un téléphone à l'autre, et c'est ce qui empêchait l'outil
+ * de fonctionner en mobilité. Une note porte sur la page, pas sur un passage.
  *
- * Les marqueurs affichent leur numéro en ::after (CSS) : ils n'ajoutent aucun
- * caractère au texte, ce qui garde exacts les repérages par contexte.
+ * Les notes vivent dans le navigateur (localStorage) et se synchronisent, quand
+ * c'est configuré, vers la branche `corrections` du repo — un fichier par page.
+ * Sans configuration, un bouton copie le tout pour le coller dans la
+ * conversation.
  */
 
-type Correction = {
+type Note = {
   id: string
-  extrait: string
-  avant: string
-  apres: string
-  note: string
+  texte: string
   creeLe: string
+  majLe?: string
+}
+
+type Page = {
+  chemin: string
+  titre: string
+  notes: Note[]
+  valideeLe: string | null
 }
 
 const PREFIXE = 'relecture:'
-const CONTEXTE = 40
+const CLE = PREFIXE + 'cle'
 
-function lireStock(chemin: string): Correction[] {
+/* ---------------------------------------------------------------- stockage */
+
+function lirePage(chemin: string): Page {
+  const vide: Page = { chemin, titre: '', notes: [], valideeLe: null }
   try {
-    return JSON.parse(localStorage.getItem(PREFIXE + chemin) ?? '[]') as Correction[]
+    const brut = localStorage.getItem(PREFIXE + chemin)
+    if (!brut) return vide
+    const p = JSON.parse(brut) as Partial<Page> & { corrections?: { id: string; note: string; creeLe: string }[] }
+    return {
+      chemin,
+      titre: p.titre ?? '',
+      valideeLe: p.valideeLe ?? null,
+      // reprise de l'ancien format, où une note portait sur un passage
+      notes: p.notes ?? (p.corrections ?? []).map((c) => ({ id: c.id, texte: c.note, creeLe: c.creeLe })),
+    }
   } catch {
-    return []
+    return vide
   }
 }
 
-function ecrireStock(chemin: string, liste: Correction[]) {
+function ecrirePage(p: Page) {
   try {
-    if (liste.length === 0) localStorage.removeItem(PREFIXE + chemin)
-    else localStorage.setItem(PREFIXE + chemin, JSON.stringify(liste))
+    if (p.notes.length === 0 && !p.valideeLe) localStorage.removeItem(PREFIXE + p.chemin)
+    else localStorage.setItem(PREFIXE + p.chemin, JSON.stringify(p))
   } catch {
-    /* stockage indisponible : le panneau reste utilisable, sans persistance */
+    /* stockage indisponible : l'outil reste utilisable, sans persistance */
   }
 }
 
-function toutesLesCorrections(): { chemin: string; corrections: Correction[] }[] {
-  const tout: { chemin: string; corrections: Correction[] }[] = []
+function toutesLesPages(): Page[] {
+  const pages: Page[] = []
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
-      if (k && k.startsWith(PREFIXE) && k !== PREFIXE + 'cle') {
-        const chemin = k.slice(PREFIXE.length)
-        const corrections = lireStock(chemin)
-        if (corrections.length) tout.push({ chemin, corrections })
-      }
+      if (!k || !k.startsWith(PREFIXE) || k === CLE) continue
+      const p = lirePage(k.slice(PREFIXE.length))
+      if (p.notes.length || p.valideeLe) pages.push(p)
     }
   } catch {
     /* voir ci-dessus */
   }
-  return tout.sort((a, b) => a.chemin.localeCompare(b.chemin))
+  return pages.sort((a, b) => a.chemin.localeCompare(b.chemin))
 }
 
-function texteBloc(): string {
-  const parties = toutesLesCorrections().map(({ chemin, corrections }) => {
-    const lignes = corrections.map(
-      (c, i) => `${i + 1}. « ${c.extrait} »\n   → ${c.note}`,
-    )
-    return `== ${chemin}\n${lignes.join('\n')}`
-  })
-  return `Corrections de relecture\n\n${parties.join('\n\n')}\n`
+function texteBloc(pages: Page[]): string {
+  const blocs = pages
+    .filter((p) => p.notes.length)
+    .map((p) => {
+      const lignes = p.notes.map((n, i) => `${i + 1}. ${n.texte}`)
+      return `== ${p.titre || p.chemin}\n   ${p.chemin}\n${lignes.join('\n')}`
+    })
+  const validees = pages.filter((p) => p.valideeLe)
+  const fin = validees.length
+    ? `\n\nPages validées\n${validees.map((p) => `— ${p.titre || p.chemin} (${jour(p.valideeLe!)})`).join('\n')}\n`
+    : '\n'
+  return `Notes de relecture\n\n${blocs.join('\n\n')}${fin}`
 }
 
-/** Première occurrence de l'extrait dont le contexte amont correspond. */
-function trouverOffset(texte: string, c: Correction): number {
-  let i = texte.indexOf(c.extrait)
-  let premier = i
-  while (i !== -1) {
-    const amont = texte.slice(Math.max(0, i - c.avant.length), i)
-    if (c.avant === '' || amont === c.avant) return i
-    i = texte.indexOf(c.extrait, i + 1)
-  }
-  return premier
-}
+const jour = (iso: string) =>
+  new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 
-function noeudALOffset(zone: HTMLElement, offset: number): { noeud: Text; decalage: number } | null {
-  const marcheur = document.createTreeWalker(zone, NodeFilter.SHOW_TEXT)
-  let cumul = 0
-  let n = marcheur.nextNode() as Text | null
-  while (n) {
-    if (cumul + n.data.length >= offset) return { noeud: n, decalage: offset - cumul }
-    cumul += n.data.length
-    n = marcheur.nextNode() as Text | null
-  }
-  return null
-}
+/* ------------------------------------------------------------------ écran */
+
+type Vue = null | 'note' | 'liste'
 
 export function Relecture() {
   const chemin = usePathname()
   const [monte, setMonte] = useState(false)
-  const [liste, setListe] = useState<Correction[]>([])
-  const [panneau, setPanneau] = useState(false)
-  const [modeSelection, setModeSelection] = useState(false)
-  const [pastille, setPastille] = useState<{ x: number; y: number } | null>(null)
-  const [dialogue, setDialogue] = useState<{ extrait: string; avant: string; apres: string } | null>(null)
-  const [note, setNote] = useState('')
+  const [page, setPage] = useState<Page>({ chemin, titre: '', notes: [], valideeLe: null })
+  const [pages, setPages] = useState<Page[]>([])
+  const [vue, setVue] = useState<Vue>(null)
+  const [texte, setTexte] = useState('')
   const [enEdition, setEnEdition] = useState<string | null>(null)
-  const [noteEdition, setNoteEdition] = useState('')
-  const [etatSync, setEtatSync] = useState<'inconnu' | 'github' | 'local' | 'cle'>('inconnu')
+  const [texteEdition, setTexteEdition] = useState('')
+  const [ouvertes, setOuvertes] = useState<string[]>([])
+  const [sync, setSync] = useState<'inconnu' | 'github' | 'local' | 'cle'>('inconnu')
   const [copie, setCopie] = useState(false)
-  const [totalAilleurs, setTotalAilleurs] = useState(0)
-  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    setMonte(true)
-  }, [])
+  useEffect(() => setMonte(true), [])
 
   useEffect(() => {
     if (!monte) return
-    setListe(lireStock(chemin))
-    setPanneau(false)
-    setModeSelection(false)
-    setDialogue(null)
+    setPage(lirePage(chemin))
+    setPages(toutesLesPages())
+    setVue(null)
+    setTexte('')
+    setEnEdition(null)
   }, [monte, chemin])
 
-  useEffect(() => {
-    if (!monte) return
-    const total = toutesLesCorrections().reduce((s, p) => s + p.corrections.length, 0)
-    setTotalAilleurs(total - liste.length)
-  }, [monte, liste])
-
-  /* ---- marqueurs numérotés dans la page ---- */
-  useEffect(() => {
-    if (!monte) return
-    const zone = document.querySelector('main')
-    if (!zone) return
-    zone.querySelectorAll('sup.rel-marq').forEach((m) => m.remove())
-
-    const texte = zone.textContent ?? ''
-    const places = liste
-      .map((c, i) => ({ c, i, offset: trouverOffset(texte, c) }))
-      .filter((p) => p.offset !== -1)
-      .sort((a, b) => b.offset - a.offset)
-
-    for (const p of places) {
-      const fin = noeudALOffset(zone as HTMLElement, p.offset + p.c.extrait.length)
-      if (!fin) continue
-      const reste = fin.noeud.splitText(fin.decalage)
-      const marque = document.createElement('sup')
-      marque.className = 'rel-marq'
-      marque.dataset.n = String(p.i + 1)
-      marque.title = p.c.note
-      marque.onclick = () => setPanneau(true)
-      reste.parentNode?.insertBefore(marque, reste)
-    }
-    return () => {
-      zone.querySelectorAll('sup.rel-marq').forEach((m) => m.remove())
-    }
-  }, [monte, liste, chemin])
-
-  /* ---- pastille « Noter » qui suit la sélection ---- */
-  useEffect(() => {
-    if (!modeSelection) {
-      setPastille(null)
-      return
-    }
-    const surSelection = () => {
-      const sel = window.getSelection()
-      if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
-        setPastille(null)
-        return
-      }
-      const zone = document.querySelector('main')
-      if (!zone || !zone.contains(sel.anchorNode)) return
-      const r = sel.getRangeAt(0).getBoundingClientRect()
-      setPastille({ x: r.left + r.width / 2, y: r.top })
-    }
-    document.addEventListener('selectionchange', surSelection)
-    return () => document.removeEventListener('selectionchange', surSelection)
-  }, [modeSelection])
-
-  const capturerSelection = useCallback(() => {
-    const sel = window.getSelection()
-    const zone = document.querySelector('main')
-    if (!sel || sel.isCollapsed || sel.rangeCount === 0 || !zone) return
-    const extrait = sel.toString()
-    if (!extrait.trim()) return
-    const r = sel.getRangeAt(0)
-    const amont = r.cloneRange()
-    amont.selectNodeContents(zone)
-    amont.setEnd(r.startContainer, r.startOffset)
-    const debut = amont.toString().length
-    const texte = zone.textContent ?? ''
-    setDialogue({
-      extrait,
-      avant: texte.slice(Math.max(0, debut - CONTEXTE), debut),
-      apres: texte.slice(debut + extrait.length, debut + extrait.length + CONTEXTE),
-    })
-    setNote('')
-    setPastille(null)
-  }, [])
+  /* Le titre de la page sert d'étiquette dans la liste. */
+  const titreCourant = useCallback(
+    () => document.querySelector('main h1')?.textContent?.trim() || document.title || chemin,
+    [chemin],
+  )
 
   const enregistrer = useCallback(
-    (nouvelle: Correction[]) => {
-      setListe(nouvelle)
-      ecrireStock(chemin, nouvelle)
-      if (syncTimer.current) clearTimeout(syncTimer.current)
-      syncTimer.current = setTimeout(async () => {
+    (suite: Page) => {
+      setPage(suite)
+      ecrirePage(suite)
+      setPages(toutesLesPages())
+      void (async () => {
         try {
           const reponse = await fetch('/api/corrections', {
             method: 'POST',
             headers: {
               'content-type': 'application/json',
-              'x-relecture-cle': localStorage.getItem(PREFIXE + 'cle') ?? '',
+              'x-relecture-cle': localStorage.getItem(CLE) ?? '',
             },
-            body: JSON.stringify({ chemin, corrections: nouvelle }),
+            body: JSON.stringify({
+              chemin: suite.chemin,
+              titre: suite.titre,
+              valideeLe: suite.valideeLe,
+              notes: suite.notes,
+            }),
           })
-          if (reponse.ok) setEtatSync('github')
-          else if (reponse.status === 401) setEtatSync('cle')
-          else setEtatSync('local')
+          if (reponse.ok) setSync('github')
+          else if (reponse.status === 401) setSync('cle')
+          else setSync('local')
         } catch {
-          setEtatSync('local')
+          setSync('local')
         }
-      }, 1200)
+      })()
     },
-    [chemin],
+    [],
   )
 
-  const valider = useCallback(() => {
-    if (!dialogue || !note.trim()) return
-    const nouvelle: Correction = {
-      id: Math.random().toString(36).slice(2, 10),
-      ...dialogue,
-      note: note.trim(),
-      creeLe: new Date().toISOString(),
-    }
-    window.getSelection()?.removeAllRanges()
-    setDialogue(null)
-    setModeSelection(false)
-    enregistrer([...liste, nouvelle])
-  }, [dialogue, note, liste, enregistrer])
+  const ajouter = useCallback(() => {
+    const t = texte.trim()
+    if (!t) return
+    enregistrer({
+      ...page,
+      titre: page.titre || titreCourant(),
+      notes: [...page.notes, { id: Math.random().toString(36).slice(2, 10), texte: t, creeLe: new Date().toISOString() }],
+    })
+    setTexte('')
+    setVue(null)
+  }, [texte, page, enregistrer, titreCourant])
+
+  const basculerValidee = useCallback(() => {
+    enregistrer({
+      ...page,
+      titre: page.titre || titreCourant(),
+      valideeLe: page.valideeLe ? null : new Date().toISOString(),
+    })
+  }, [page, enregistrer, titreCourant])
+
+  /** Une note se modifie depuis la liste, y compris sur une autre page. */
+  const enregistrerAilleurs = useCallback(
+    (suite: Page) => {
+      if (suite.chemin === chemin) {
+        enregistrer(suite)
+        return
+      }
+      ecrirePage(suite)
+      setPages(toutesLesPages())
+      void fetch('/api/corrections', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-relecture-cle': localStorage.getItem(CLE) ?? '',
+        },
+        body: JSON.stringify({
+          chemin: suite.chemin,
+          titre: suite.titre,
+          valideeLe: suite.valideeLe,
+          notes: suite.notes,
+        }),
+      }).catch(() => setSync('local'))
+    },
+    [chemin, enregistrer],
+  )
+
+  const modifierNote = useCallback(
+    (cible: Page, id: string, valeur: string) =>
+      enregistrerAilleurs({
+        ...cible,
+        notes: cible.notes.map((n) =>
+          n.id === id ? { ...n, texte: valeur, majLe: new Date().toISOString() } : n,
+        ),
+      }),
+    [enregistrerAilleurs],
+  )
+
+  const supprimerNote = useCallback(
+    (cible: Page, id: string) =>
+      enregistrerAilleurs({ ...cible, notes: cible.notes.filter((n) => n.id !== id) }),
+    [enregistrerAilleurs],
+  )
 
   const copier = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(texteBloc())
+      await navigator.clipboard.writeText(texteBloc(pages))
       setCopie(true)
       setTimeout(() => setCopie(false), 2000)
     } catch {
       /* presse-papier refusé : rien à faire de mieux */
     }
-  }, [])
+  }, [pages])
+
+  const total = useMemo(() => pages.reduce((s, p) => s + p.notes.length, 0), [pages])
+  const validees = useMemo(() => pages.filter((p) => p.valideeLe), [pages])
+  const aNotes = useMemo(() => pages.filter((p) => p.notes.length), [pages])
 
   // Le livre feuilletable est un lecteur plein écran : rien ne s'y superpose.
   if (!monte || chemin.startsWith('/atelier/livre')) return null
 
-  const carte =
-    'rounded-[2px] border border-piste bg-fond-carte'
+  // L'ombre douce détache les boutons du texte qui défile dessous (charte, §8).
+  const bouton =
+    'flex h-11 flex-1 items-center justify-center gap-2 rounded-[2px] border border-piste bg-fond-carte px-3 text-mention uppercase tracking-wider text-texte shadow-[0_2px_10px_rgba(21,32,53,0.10)] sm:flex-none'
+  const feuille =
+    'fixed inset-x-0 bottom-0 z-[80] flex max-h-[85dvh] flex-col rounded-t-[6px] border border-piste bg-fond-carte pb-[env(safe-area-inset-bottom)] sm:inset-x-auto sm:bottom-20 sm:right-4 sm:w-[400px] sm:rounded-[2px] sm:pb-0'
 
   return (
     <>
-      {/* bouton flottant */}
-      <button
-        type="button"
-        onClick={() => {
-          setPanneau((p) => !p)
-          setModeSelection(false)
-        }}
-        aria-label="Relecture"
-        className={`${carte} fixed bottom-4 right-4 z-[60] flex h-11 items-center gap-2 px-4`}
+      {/* barre de boutons */}
+      <div
+        className="fixed inset-x-3 z-[60] flex gap-2 sm:inset-x-auto sm:right-4"
+        style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
       >
-        <span className="chiffre text-mention uppercase tracking-wider text-texte">
-          Relecture
-        </span>
-        {liste.length > 0 && (
-          <span className="chiffre flex h-5 min-w-5 items-center justify-center rounded-full bg-vert px-1 text-mention text-fond-carte">
-            {liste.length}
-          </span>
-        )}
-      </button>
-
-      {/* consigne du mode sélection */}
-      {modeSelection && !dialogue && (
-        <div
-          className={`${carte} fixed bottom-20 right-4 z-[60] flex items-center gap-4 px-4 py-3`}
-        >
-          <span className="text-petit text-texte">
-            Sélectionner le texte à corriger.
-          </span>
-          <button
-            type="button"
-            onClick={() => setModeSelection(false)}
-            className="chiffre text-mention uppercase tracking-wider text-texte-faible"
-          >
-            Annuler
-          </button>
-        </div>
-      )}
-
-      {/* pastille au-dessus de la sélection */}
-      {modeSelection && pastille && !dialogue && (
         <button
           type="button"
-          onClick={capturerSelection}
-          className="fixed z-[70] -translate-x-1/2 -translate-y-full rounded-[2px] bg-texte px-3 py-1.5 text-petit text-fond-carte"
-          style={{ left: pastille.x, top: pastille.y - 6 }}
+          onClick={() => {
+            setVue(vue === 'note' ? null : 'note')
+            setTexte('')
+          }}
+          className={`chiffre ${bouton}`}
         >
           Noter
         </button>
-      )}
+        <button
+          type="button"
+          onClick={() => setVue(vue === 'liste' ? null : 'liste')}
+          className={`chiffre ${bouton}`}
+        >
+          Liste
+          {total > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-vert px-1 text-mention text-fond-carte">
+              {total}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={basculerValidee}
+          aria-pressed={page.valideeLe !== null}
+          className={`chiffre ${bouton} ${page.valideeLe ? 'border-vert text-vert' : ''}`}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7.4 5.4 11 12 3.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {page.valideeLe ? 'Validée' : 'Valider'}
+        </button>
+      </div>
 
-      {/* boîte de dialogue */}
-      {dialogue && (
-        <div className="fixed inset-0 z-[80] flex items-end justify-center bg-texte/20 p-4 sm:items-center">
-          <div className={`${carte} w-full max-w-md p-5`}>
-            <p className="chiffre text-mention uppercase tracking-wider text-texte-faible">
-              Passage sélectionné
-            </p>
-            <p className="mt-2 max-h-20 overflow-y-auto font-titre text-petit italic text-texte">
-              « {dialogue.extrait} »
-            </p>
-            <label className="chiffre mt-4 block text-mention uppercase tracking-wider text-texte-faible">
-              Ce qu&rsquo;il faut changer
-            </label>
-            <textarea
-              autoFocus
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={3}
-              className="mt-2 w-full rounded-[2px] border border-piste bg-fond p-2 text-petit text-texte"
-            />
-            <div className="mt-4 flex justify-end gap-4">
+      {/* encart d'écriture */}
+      {vue === 'note' && (
+        <>
+          <div className="fixed inset-0 z-[70] bg-texte/20" onClick={() => setVue(null)} />
+          <div className={feuille}>
+            <div className="flex items-center justify-between border-b border-piste px-4 py-3">
+              <span className="chiffre text-mention uppercase tracking-wider text-texte-faible">
+                Note sur cette page
+              </span>
               <button
                 type="button"
-                onClick={() => setDialogue(null)}
+                onClick={() => setVue(null)}
                 className="chiffre text-mention uppercase tracking-wider text-texte-faible"
               >
-                Annuler
+                Fermer
               </button>
+            </div>
+            <div className="p-4">
+              <textarea
+                autoFocus
+                value={texte}
+                onChange={(e) => setTexte(e.target.value)}
+                rows={5}
+                placeholder="Ce qu'il faut changer sur cette page."
+                className="w-full rounded-[2px] border border-piste bg-fond p-3 text-petit text-texte"
+              />
               <button
                 type="button"
-                onClick={valider}
-                disabled={!note.trim()}
-                className="chiffre rounded-[2px] bg-vert px-4 py-2 text-mention uppercase tracking-wider text-fond-carte disabled:opacity-40"
+                onClick={ajouter}
+                disabled={!texte.trim()}
+                className="chiffre mt-3 h-11 w-full rounded-[2px] bg-vert text-mention uppercase tracking-wider text-fond-carte disabled:opacity-40"
               >
                 Valider
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* panneau : liste des corrections */}
-      {panneau && !modeSelection && !dialogue && (
-        <div
-          className={`${carte} fixed bottom-20 right-4 z-[60] flex max-h-[70vh] w-[min(92vw,380px)] flex-col`}
-        >
-          <div className="border-b border-piste p-4">
-            <button
-              type="button"
-              onClick={() => {
-                setPanneau(false)
-                setModeSelection(true)
-              }}
-              className="chiffre w-full rounded-[2px] bg-vert px-4 py-2.5 text-mention uppercase tracking-wider text-fond-carte"
-            >
-              Corriger un passage
-            </button>
-          </div>
+      {/* liste de toutes les notes, page par page */}
+      {vue === 'liste' && (
+        <>
+          <div className="fixed inset-0 z-[70] bg-texte/20" onClick={() => setVue(null)} />
+          <div className={feuille}>
+            <div className="flex items-center justify-between border-b border-piste px-4 py-3">
+              <span className="chiffre text-mention uppercase tracking-wider text-texte-faible">
+                {total} note{total > 1 ? 's' : ''} sur {aNotes.length} page{aNotes.length > 1 ? 's' : ''}
+              </span>
+              <button
+                type="button"
+                onClick={() => setVue(null)}
+                className="chiffre text-mention uppercase tracking-wider text-texte-faible"
+              >
+                Fermer
+              </button>
+            </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
-            {liste.length === 0 ? (
-              <p className="text-petit text-texte-faible">
-                Aucune correction sur cette page.
-              </p>
-            ) : (
-              <ol className="flex flex-col gap-4">
-                {liste.map((c, i) => (
-                  <li key={c.id} className="border-b border-piste pb-3">
-                    <p className="chiffre text-mention text-texte-faible">
-                      {i + 1} · « {c.extrait.length > 60 ? c.extrait.slice(0, 60) + '…' : c.extrait} »
-                    </p>
-                    {enEdition === c.id ? (
-                      <>
-                        <textarea
-                          value={noteEdition}
-                          onChange={(e) => setNoteEdition(e.target.value)}
-                          rows={2}
-                          className="mt-2 w-full rounded-[2px] border border-piste bg-fond p-2 text-petit text-texte"
-                        />
-                        <div className="mt-2 flex justify-end gap-4">
-                          <button
-                            type="button"
-                            onClick={() => setEnEdition(null)}
-                            className="chiffre text-mention uppercase tracking-wider text-texte-faible"
-                          >
-                            Annuler
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              enregistrer(
-                                liste.map((x) =>
-                                  x.id === c.id ? { ...x, note: noteEdition.trim() } : x,
-                                ),
-                              )
-                              setEnEdition(null)
-                            }}
-                            disabled={!noteEdition.trim()}
-                            className="chiffre text-mention uppercase tracking-wider text-vert disabled:opacity-40"
-                          >
-                            Enregistrer
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="mt-1 flex items-start justify-between gap-3">
-                        <p className="text-petit text-texte">{c.note}</p>
-                        <span className="flex shrink-0 gap-3">
-                          <button
-                            type="button"
-                            aria-label="Modifier"
-                            onClick={() => {
-                              setEnEdition(c.id)
-                              setNoteEdition(c.note)
-                            }}
-                            className="text-texte-faible"
-                          >
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                              <path d="M10.5 1.5 13.5 4.5 5 13H2v-3l8.5-8.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-                            </svg>
-                          </button>
-                          <button
-                            type="button"
-                            aria-label="Supprimer"
-                            onClick={() => enregistrer(liste.filter((x) => x.id !== c.id))}
-                            className="text-texte-faible"
-                          >
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                              <path d="M3 4h9M6 4V2.5h3V4M4 4l.7 9h5.6L11 4" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-                            </svg>
-                          </button>
+            <div className="flex-1 overflow-y-auto">
+              {aNotes.length === 0 && (
+                <p className="p-4 text-petit text-texte-faible">
+                  Aucune note pour le moment. Le bouton « Noter » en ajoute une sur la page où vous
+                  êtes.
+                </p>
+              )}
+
+              {aNotes.map((p) => {
+                const ouverte = ouvertes.includes(p.chemin) || p.chemin === chemin
+                return (
+                  <section key={p.chemin} className="border-b border-piste">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOuvertes((o) =>
+                          o.includes(p.chemin) ? o.filter((x) => x !== p.chemin) : [...o, p.chemin],
+                        )
+                      }
+                      className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-petit text-texte">
+                          {p.titre || p.chemin}
                         </span>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            )}
-          </div>
+                        <span className="chiffre block truncate text-mention text-texte-faible">
+                          {p.chemin}
+                          {p.chemin === chemin ? ' · page courante' : ''}
+                        </span>
+                      </span>
+                      <span className="chiffre flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-piste px-1 text-mention text-texte">
+                        {p.notes.length}
+                      </span>
+                    </button>
 
-          <div className="border-t border-piste p-4">
-            <p className="chiffre text-mention uppercase tracking-wider text-texte-faible">
-              {liste.length} sur cette page
-              {totalAilleurs > 0 ? ` · ${totalAilleurs} ailleurs` : ''}
-              {etatSync === 'github' && ' · enregistrées sur GitHub'}
-              {etatSync === 'local' && ' · locales seulement'}
-              {etatSync === 'cle' && ' · clé de relecture requise'}
-            </p>
-            {etatSync === 'cle' && (
-              <input
-                type="password"
-                placeholder="Clé de relecture"
-                className="mt-2 w-full rounded-[2px] border border-piste bg-fond p-2 text-petit"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    localStorage.setItem(PREFIXE + 'cle', (e.target as HTMLInputElement).value)
-                    enregistrer([...liste])
-                  }
-                }}
-              />
-            )}
-            {(etatSync === 'local' || etatSync === 'cle' || etatSync === 'inconnu') && (
+                    {ouverte && (
+                      <ol className="flex flex-col gap-3 px-4 pb-4">
+                        {p.notes.map((n, i) => (
+                          <li key={n.id} className="rounded-[2px] border border-piste p-3">
+                            {enEdition === n.id ? (
+                              <>
+                                <textarea
+                                  value={texteEdition}
+                                  onChange={(e) => setTexteEdition(e.target.value)}
+                                  rows={3}
+                                  className="w-full rounded-[2px] border border-piste bg-fond p-2 text-petit text-texte"
+                                />
+                                <div className="mt-2 flex justify-end gap-4">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEnEdition(null)}
+                                    className="chiffre text-mention uppercase tracking-wider text-texte-faible"
+                                  >
+                                    Annuler
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      modifierNote(p, n.id, texteEdition.trim())
+                                      setEnEdition(null)
+                                    }}
+                                    disabled={!texteEdition.trim()}
+                                    className="chiffre text-mention uppercase tracking-wider text-vert disabled:opacity-40"
+                                  >
+                                    Enregistrer
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <p className="chiffre text-mention text-texte-faible">
+                                  {i + 1} · {jour(n.majLe ?? n.creeLe)}
+                                </p>
+                                <p className="mt-1 whitespace-pre-wrap text-petit text-texte">
+                                  {n.texte}
+                                </p>
+                                <div className="mt-2 flex justify-end gap-4">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEnEdition(n.id)
+                                      setTexteEdition(n.texte)
+                                    }}
+                                    className="chiffre text-mention uppercase tracking-wider text-texte-faible"
+                                  >
+                                    Modifier
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => supprimerNote(p, n.id)}
+                                    className="chiffre text-mention uppercase tracking-wider text-texte-faible"
+                                  >
+                                    Supprimer
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </section>
+                )
+              })}
+
+              {/* historique des pages validées */}
+              <section className="px-4 py-4">
+                <p className="chiffre text-mention uppercase tracking-wider text-texte-faible">
+                  Pages validées · {validees.length}
+                </p>
+                {validees.length === 0 ? (
+                  <p className="mt-2 text-petit text-texte-faible">
+                    Le bouton « Valider » marque la page où vous êtes comme relue.
+                  </p>
+                ) : (
+                  <ul className="mt-2 flex flex-col gap-2">
+                    {validees
+                      .slice()
+                      .sort((a, b) => (b.valideeLe ?? '').localeCompare(a.valideeLe ?? ''))
+                      .map((p) => (
+                        <li key={p.chemin} className="flex items-center justify-between gap-3">
+                          <a href={p.chemin} className="min-w-0 truncate text-petit text-texte">
+                            {p.titre || p.chemin}
+                          </a>
+                          <span className="chiffre shrink-0 text-mention text-texte-faible">
+                            {jour(p.valideeLe!)}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </section>
+            </div>
+
+            <div className="border-t border-piste p-4">
+              <p className="chiffre text-mention uppercase tracking-wider text-texte-faible">
+                {sync === 'github' && 'Enregistrées sur GitHub'}
+                {sync === 'local' && 'Locales seulement'}
+                {sync === 'cle' && 'Clé de relecture requise'}
+                {sync === 'inconnu' && 'Enregistrées dans ce navigateur'}
+              </p>
+              {sync === 'cle' && (
+                <input
+                  type="password"
+                  placeholder="Clé de relecture"
+                  className="mt-2 w-full rounded-[2px] border border-piste bg-fond p-2 text-petit"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      localStorage.setItem(CLE, (e.target as HTMLInputElement).value)
+                      enregistrer({ ...page })
+                    }
+                  }}
+                />
+              )}
               <button
                 type="button"
                 onClick={copier}
-                className="chiffre mt-2 w-full rounded-[2px] border border-piste px-4 py-2 text-mention uppercase tracking-wider text-texte"
+                className="chiffre mt-2 h-11 w-full rounded-[2px] border border-piste text-mention uppercase tracking-wider text-texte"
               >
                 {copie ? 'Copié' : 'Copier tout pour Claude'}
               </button>
-            )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </>
   )

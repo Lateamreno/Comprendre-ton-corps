@@ -1,8 +1,9 @@
 /**
  * Réception des corrections de relecture.
  *
- * Les corrections d'une page sont écrites telles quelles dans le repo, sur la
- * branche `corrections` — un fichier JSON par page. Pas de base de données :
+ * Les notes d'une page, et le fait qu'elle soit validée, sont écrites telles
+ * quelles dans le repo, sur la branche `corrections` — un fichier JSON par
+ * page. Pas de base de données :
  * Git est le stockage, comme pour tout le contenu (CLAUDE.md §2, règle 4), et
  * c'est là que Claude les lit pour les appliquer par lot.
  *
@@ -17,13 +18,11 @@ const DEPOT = 'Lateamreno/Comprendre-ton-corps'
 const BRANCHE = 'corrections'
 const API = `https://api.github.com/repos/${DEPOT}/contents`
 
-type Correction = {
+type Note = {
   id: string
-  extrait: string
-  avant: string
-  apres: string
-  note: string
+  texte: string
   creeLe: string
+  majLe?: string
 }
 
 function nomFichier(chemin: string): string {
@@ -61,22 +60,25 @@ export async function POST(req: Request) {
     return Response.json({ erreur: 'clé de relecture invalide' }, { status: 401 })
   }
 
-  let corps: { chemin?: string; corrections?: Correction[] }
+  let corps: { chemin?: string; titre?: string; valideeLe?: string | null; notes?: Note[] }
   try {
     corps = await req.json()
   } catch {
     return Response.json({ erreur: 'JSON invalide' }, { status: 400 })
   }
   const chemin = corps.chemin
-  const corrections = corps.corrections
-  if (typeof chemin !== 'string' || !chemin.startsWith('/') || !Array.isArray(corrections)) {
-    return Response.json({ erreur: 'chemin ou corrections manquants' }, { status: 400 })
+  const notes = corps.notes
+  const valideeLe = corps.valideeLe ?? null
+  if (typeof chemin !== 'string' || !chemin.startsWith('/') || !Array.isArray(notes)) {
+    return Response.json({ erreur: 'chemin ou notes manquants' }, { status: 400 })
   }
-  if (JSON.stringify(corrections).length > 200_000) {
+  if (JSON.stringify(notes).length > 200_000) {
     return Response.json({ erreur: 'trop volumineux' }, { status: 413 })
   }
 
   const fichier = nomFichier(chemin)
+  // Une page sans note et non validée n'a plus rien à dire : son fichier part.
+  const vide = notes.length === 0 && !valideeLe
 
   // Un conflit de sha peut survenir entre la lecture et l'écriture : on refait
   // une passe avant d'abandonner.
@@ -84,13 +86,13 @@ export async function POST(req: Request) {
     try {
       const sha = await shaExistant(jeton, fichier)
 
-      if (corrections.length === 0) {
+      if (vide) {
         if (sha === null) return Response.json({ ok: true })
         const suppression = await fetch(`${API}/${fichier}`, {
           method: 'DELETE',
           headers: entetes(jeton),
           body: JSON.stringify({
-            message: `Relecture : plus de corrections sur ${chemin}`,
+            message: `Relecture : plus rien à signaler sur ${chemin}`,
             sha,
             branch: BRANCHE,
           }),
@@ -100,12 +102,21 @@ export async function POST(req: Request) {
         throw new Error(`GitHub ${suppression.status}`)
       }
 
-      const contenu = { chemin, majLe: new Date().toISOString(), corrections }
+      const contenu = {
+        chemin,
+        titre: corps.titre ?? '',
+        valideeLe,
+        majLe: new Date().toISOString(),
+        notes,
+      }
+      const resume = valideeLe
+        ? `page validée${notes.length ? `, ${notes.length} note(s)` : ''}`
+        : `${notes.length} note(s)`
       const ecriture = await fetch(`${API}/${fichier}`, {
         method: 'PUT',
         headers: entetes(jeton),
         body: JSON.stringify({
-          message: `Relecture : ${corrections.length} correction(s) sur ${chemin}`,
+          message: `Relecture : ${resume} sur ${chemin}`,
           content: Buffer.from(JSON.stringify(contenu, null, 2), 'utf8').toString('base64'),
           branch: BRANCHE,
           ...(sha ? { sha } : {}),
