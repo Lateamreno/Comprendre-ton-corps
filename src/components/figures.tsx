@@ -1575,6 +1575,67 @@ export function FigureAssiette() {
   )
 }
 
+/**
+ * Le classement DIAAS des sources de protéines.
+ *
+ * L'indice combine deux choses : la présence de l'acide aminé qui manque le
+ * plus, et la part réellement absorbée. Il ne dit rien du muscle gagné — la
+ * page explique pourquoi l'écart se referme —, il dit ce qu'un gramme de
+ * protéine apporte de matière utilisable. L'acide aminé limitant est écrit
+ * à côté de chaque barre : c'est lui qui fixe le score.
+ */
+export function FigureQualiteProteines() {
+  const sources = [
+    { nom: 'Viande de porc', score: 117, limitant: '—' },
+    { nom: 'Caséine du lait', score: 117, limitant: '—' },
+    { nom: 'Œuf', score: 101, limitant: '—' },
+    { nom: 'Protéine de soja', score: 91, limitant: 'méthionine' },
+    { nom: 'Lactosérum', score: 85, limitant: 'histidine' },
+    { nom: 'Protéine de pois', score: 70, limitant: 'méthionine' },
+    { nom: 'Protéine de blé', score: 48, limitant: 'lysine' },
+    { nom: 'Protéine de riz', score: 47, limitant: 'lysine' },
+  ]
+
+  const gauche = 112
+  const large = 132
+  const max = 120
+  const y = (i: number) => 22 + i * 15
+
+  return (
+    <Figure legende="Score DIAAS de huit sources de protéines, d'après le recensement de référence. Le score mesure la part absorbée de l'acide aminé qui manque le plus, et l'acide aminé en question est écrit à droite. Les valeurs portent sur des concentrés et des isolats, pas sur l'aliment entier, et varient selon le profil de référence retenu : c'est l'ordre qui compte.">
+      <svg viewBox="0 0 340 148" style={{ width: '95%', height: 'auto', display: 'block', margin: '0 auto' }} role="img"
+        aria-label="Score DIAAS de huit sources de protéines, du porc au riz">
+        <text x={gauche} y="12" style={{ ...stylePetit, fontSize: 9 }}>
+          score DIAAS
+        </text>
+        <line x1={gauche + (100 / max) * large} y1="15" x2={gauche + (100 / max) * large} y2={y(sources.length - 1) + 14}
+          stroke={palette.texteFaible} strokeWidth="0.8" strokeDasharray="2 2" />
+        <text x={gauche + (100 / max) * large + 4} y="12" style={{ ...stylePetit, fontSize: 8 }}>
+          100
+        </text>
+        {sources.map((s, i) => (
+          <g key={s.nom}>
+            <text x={gauche - 8} y={y(i) + 9} textAnchor="end"
+              style={{ ...styleEtiquette, fontSize: 9.5, fill: palette.texte }}>
+              {s.nom}
+            </text>
+            <rect x={gauche} y={y(i)} width={large} height="11" rx="1" fill={palette.piste} />
+            <rect x={gauche} y={y(i)} width={(Math.min(s.score, max) / max) * large} height="11" rx="1"
+              fill={identites.proteines.couleur} />
+            <text x={gauche + large + 8} y={y(i) + 9}
+              style={{ ...stylePetit, fontSize: 9, fill: palette.texte }}>
+              {s.score}
+            </text>
+            <text x={gauche + large + 30} y={y(i) + 9} style={{ ...stylePetit, fontSize: 8 }}>
+              {s.limitant}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </Figure>
+  )
+}
+
 export const composantsFigures = {
   Volet,
   DeuxSens,
@@ -1599,4 +1660,5 @@ export const composantsFigures = {
   FigureReponses,
   FigureArret,
   FigureAssiette,
+  FigureQualiteProteines,
 }
